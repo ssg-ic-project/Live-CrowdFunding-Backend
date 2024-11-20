@@ -53,4 +53,7 @@ public class ProjectController {
     public ResponseEntity<PageListResponseDTO<ProjectListResponseDTO>> getProjectList(@RequestBody ProjectListRequestDTO requestDTO, @ModelAttribute PageRequestDTO pageRequestDTO) {
         return ResponseEntity.ok(projectService.getProjectList(requestDTO, pageRequestDTO));
     }
+
+    // 메인 페이지
+
 }

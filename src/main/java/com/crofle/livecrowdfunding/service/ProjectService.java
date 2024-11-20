@@ -21,4 +21,6 @@ public interface ProjectService {
     void updateProject(Long id, ProjectUpdateRequestDTO requestDTO);
 
     PageListResponseDTO<ProjectListResponseDTO> getProjectList(ProjectListRequestDTO requestDTO, PageRequestDTO pageRequestDTO);
+
+    ProjectMainResponseDTO getMainProjects();
 }

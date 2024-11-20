@@ -2,13 +2,16 @@ package com.crofle.livecrowdfunding.repository;
 
 import com.crofle.livecrowdfunding.domain.entity.Project;
 import com.crofle.livecrowdfunding.domain.enums.ProjectStatus;
+import com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.ProjectStatisticsResponseDTO;
+import com.crofle.livecrowdfunding.dto.response.TopFundingInMainResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +49,18 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query("SELECT p FROM Project p WHERE p.progressProjectStatus IN :statuses")
     Page<Project> findByProgressStatuses(@Param("statuses") List<ProjectStatus> statuses, Pageable pageable);
 
+    // 메인 화면에서 라이브중인 프로젝트 조회
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO(i.url, p.productName, p.percentage, (p.endAt - p.startAt), m.name, p.price) FROM Project p " +
+            "JOIN p.schedules s LEFT JOIN FETCH p.images i LEFT JOIN FETCH p.maker m " +
+            "WHERE s.isStreaming = true and i.imageNumber = 1 " +
+            "ORDER BY s.totalViewer DESC")
+    List<LiveFundingInMainResponseDTO> findLiveFundingInMain();
+
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.TopFundingInMainResponseDTO(t.ranking, i.url, p.productName, p.percentage, (p.endAt - p.startAt), m.name, p.price) FROM Project p " +
+            "JOIN p.topFundings t JOIN p.schedules s LEFT JOIN FETCH p.images i LEFT JOIN FETCH p.maker m " +
+            "WHERE i.imageNumber = 1 and t.updatedAt = :today " +
+            "ORDER BY t.ranking ASC")
+    List<TopFundingInMainResponseDTO> findTopFundingInMain(@Param("today") LocalDateTime today);
 
     //관리자 대시보드용
     @Query("""

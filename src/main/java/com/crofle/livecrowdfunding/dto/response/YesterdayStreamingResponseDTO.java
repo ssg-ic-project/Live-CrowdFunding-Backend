@@ -11,6 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class YesterdayStreamingResponseDTO {
     private String projectName;
-    private Long totalViewers;
+    private Integer totalViewers;
     private Long totalBuyers;
 }

@@ -143,4 +143,10 @@ public class ProjectServiceTest {
         List<ProjectListResponseDTO> projectList = projectService.getProjectList(requestDTO, PageRequestDTO.builder().page(1).size(2).build()).getDataList();
         log.info(projectList);
     }
+
+    @Test
+    public void testFindMainProjects() {
+        ProjectMainResponseDTO projectMainResponseDTO = projectService.getMainProjects();
+        log.info(projectMainResponseDTO);
+    }
 }

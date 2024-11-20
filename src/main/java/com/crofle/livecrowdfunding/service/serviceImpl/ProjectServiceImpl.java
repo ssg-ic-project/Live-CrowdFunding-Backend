@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -233,6 +235,18 @@ public class ProjectServiceImpl implements ProjectService {
                 //not allowed
                 return null;
         }
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ProjectMainResponseDTO getMainProjects() {
+        List<LiveFundingInMainResponseDTO> liveFundingProjects = projectRepository.findLiveFundingInMain();
+        List<TopFundingInMainResponseDTO> topFundingProjects = projectRepository.findTopFundingInMain(LocalDate.now().atStartOfDay());
+
+        return ProjectMainResponseDTO.builder()
+                .liveFundingProjects(liveFundingProjects)
+                .topFundingProjects(topFundingProjects)
+                .build();
     }
 
     private PageListResponseDTO<ProjectListResponseDTO> getProjectListResponseDTOPageListResponseDTO(PageRequestDTO pageRequestDTO, Page<Project> projects) {

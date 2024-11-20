@@ -17,7 +17,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query("""
             SELECT new com.crofle.livecrowdfunding.dto.response.YesterdayStreamingResponseDTO(
                 p.productName,
-                s.total_viewer,
+                s.totalViewer,
                 COUNT(DISTINCT ph.orderId)
             )
             FROM Schedule s
@@ -25,8 +25,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             LEFT JOIN p.orders o
             LEFT JOIN PaymentHistory ph ON o.id = ph.orderId
             WHERE DATE(s.date) = DATE(:yesterday)
-            GROUP BY p.productName, s.total_viewer
-            ORDER BY COUNT(DISTINCT ph.orderId) DESC, s.total_viewer DESC
+            GROUP BY p.productName, s.totalViewer
+            ORDER BY COUNT(DISTINCT ph.orderId) DESC, s.totalViewer DESC
             
             """)
     List<YesterdayStreamingResponseDTO> findYesterdaySStats(@Param("yesterday") LocalDateTime yesterday);
