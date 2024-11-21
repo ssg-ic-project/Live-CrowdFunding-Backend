@@ -26,6 +26,14 @@ jobs:
     #     echo "${{ secrets.SECRET_YML }}" | base64 --decode > src/main/resources/application-secret.yml
     #     find src
     #   shell: bash
+
+    - name: Create application.properties
+      run: |
+        cat > src/main/resources/application.properties << EOF
+        ${{ secrets.APPLICATION_PROPERTIES }}
+        EOF
+
+    
     # Gradle 권한 부여
     - name: Grant permission for gradlew
       run: chmod +x ./gradlew
