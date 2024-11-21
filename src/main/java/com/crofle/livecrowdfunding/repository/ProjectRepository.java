@@ -50,14 +50,14 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<Project> findByProgressStatuses(@Param("statuses") List<ProjectStatus> statuses, Pageable pageable);
 
     // 메인 화면에서 라이브중인 프로젝트 조회
-    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO(i.url, p.productName, p.percentage, (p.endAt - p.startAt), m.name, p.price) FROM Project p " +
-            "JOIN p.schedules s LEFT JOIN FETCH p.images i LEFT JOIN FETCH p.maker m " +
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO(i.url, p.productName, p.percentage, m.name, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long)) FROM Project p " +
+            "JOIN p.schedules s LEFT JOIN p.images i LEFT JOIN p.maker m " +
             "WHERE s.isStreaming = true and i.imageNumber = 1 " +
             "ORDER BY s.totalViewer DESC")
     List<LiveFundingInMainResponseDTO> findLiveFundingInMain();
 
-    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.TopFundingInMainResponseDTO(t.ranking, i.url, p.productName, p.percentage, (p.endAt - p.startAt), m.name, p.price) FROM Project p " +
-            "JOIN p.topFundings t JOIN p.schedules s LEFT JOIN FETCH p.images i LEFT JOIN FETCH p.maker m " +
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.TopFundingInMainResponseDTO(t.ranking, i.url, p.productName, p.percentage, m.name, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long)) FROM Project p " +
+            "JOIN p.topFundings t LEFT JOIN p.images i LEFT JOIN p.maker m " +
             "WHERE i.imageNumber = 1 and t.updatedAt = :today " +
             "ORDER BY t.ranking ASC")
     List<TopFundingInMainResponseDTO> findTopFundingInMain(@Param("today") LocalDateTime today);

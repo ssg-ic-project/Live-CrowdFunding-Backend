@@ -14,7 +14,7 @@ public class TopFundingInMainResponseDTO {
     private String url;
     private String productName;
     private Integer percentage;
-    private Integer remainingTime;
     private String makerName;
-    private Integer price;
+    private String classification;
+    private Long remainingTime;
 }
