@@ -7,7 +7,6 @@
 # Run stage
 FROM openjdk:17-slim
 #WORKDIR /app
-#COPY --from=builder /app/build/libs/*.jar app.jar
 
 ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} app.jar
