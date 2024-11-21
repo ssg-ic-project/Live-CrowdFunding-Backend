@@ -18,8 +18,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+//      @Query("SELECT u FROM User u " +
+//            "WHERE (:#{#dto.search?.US} IS NULL OR u.status = :#{T(com.crofle.livecrowdfunding.domain.enums.UserStatus).valueOf(#dto.search.US)}) " +
+//            "AND (:#{#dto.userName} IS NULL OR u.name LIKE %:#{#dto.userName}%)")
+//    Page<User> findByConditions(@Param("dto") PageRequestDTO dto, Pageable pageable);
+
     @Query("SELECT u FROM User u " +
-            "WHERE (:#{#dto.search?.US} IS NULL OR u.status = :#{T(com.crofle.livecrowdfunding.domain.enums.UserStatus).valueOf(#dto.search.US)}) " +
+            "WHERE (:#{#dto.search?.US} IS NULL OR u.status = " +
+            "CASE WHEN :#{#dto.search?.US} IS NULL THEN u.status " +
+            "ELSE :#{T(com.crofle.livecrowdfunding.domain.enums.UserStatus).valueOf(#dto.search.US)} END) " +
             "AND (:#{#dto.userName} IS NULL OR u.name LIKE %:#{#dto.userName}%)")
     Page<User> findByConditions(@Param("dto") PageRequestDTO dto, Pageable pageable);
 

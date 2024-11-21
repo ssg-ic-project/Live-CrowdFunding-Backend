@@ -22,7 +22,7 @@ public class AdminUserMgmRestController {
     private final AdminUserMgmService adminUserMgmService;
     @GetMapping("/users") //회원관리 유형: 판매자, 일반회원
     public ResponseEntity<PageListResponseDTO<UserMgmResponseDTO>> getUsers(
-            @RequestParam int page,
+            @RequestParam (defaultValue = "1") int page,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String memberType,
             @RequestParam(required = false) String name){

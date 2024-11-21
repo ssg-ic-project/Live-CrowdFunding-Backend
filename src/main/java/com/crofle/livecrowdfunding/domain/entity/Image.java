@@ -20,7 +20,7 @@ public class Image {
     @Column(nullable = false, length = 200)
     private String url;
 
-    @Column(name = "number", nullable = false)
+    @Column(name = "image_number", nullable = false)
     private Integer imageNumber;
 
     @Column(nullable = false)
