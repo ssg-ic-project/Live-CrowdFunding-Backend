@@ -1,0 +1,43 @@
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### Gradle ###
+.gradle
+#**/build/
+!src/**/build/
+gradle-app.setting
+!gradle/wrapper/gradle-wrapper.jar
+.gradletasknamecache
+
+### Build ###
+#build/
+target/
+bin/
+
+### Logs ###
+logs/
+*.log
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Testing ###
+**/test/resources/
+**/test/java/
+
+### Version Control ###
+.git
+.gitignore
+
+### Others ###
+README.md
+CHANGELOG.md
+docker-compose.yml
+docker-compose.*.yml
