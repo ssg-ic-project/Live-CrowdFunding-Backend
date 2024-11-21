@@ -1,4 +1,4 @@
-HELP.md
+*.txtHELP.md
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
@@ -51,5 +51,4 @@ build/
 out/
 *.class
 create.sql
-
 *.txt
