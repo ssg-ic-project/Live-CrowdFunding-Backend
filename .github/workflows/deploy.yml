@@ -39,14 +39,15 @@ jobs:
         docker build -t ${{ secrets.DOCKER_REPO }}/spring-server .
         docker push ${{ secrets.DOCKER_REPO }}/spring-server
 
-    - name: Deploy to EC2
+    - name: Deploy to NCP
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.BASTION_HOST }}
         username: ${{ secrets.BASTION_USERNAME }}
-        key: ${{ secrets.BASTION_SSH_KEY }}
+        password: ${{secrets.REMOTE_SSH_KEY}}
         script: |
-          ssh -i ~/.ssh/private_instance_key ${{ secrets.PRIVATE_INSTANCE_USERNAME }}@${{ secrets.PRIVATE_INSTANCE_IP }} '
+            apt-get update && apt-get install -y sshpass
+            sshpass -p "${{ secrets.PRIVATE_INSTANCE_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.PRIVATE_INSTANCE_USERNAME }}@${{ secrets.PRIVATE_INSTANCE_IP }} '
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker pull ${{ secrets.DOCKER_USERNAME }}/spring-app
             cd /app
