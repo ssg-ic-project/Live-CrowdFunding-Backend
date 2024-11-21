@@ -3,6 +3,7 @@ package com.crofle.livecrowdfunding.service.serviceImpl;
 import com.crofle.livecrowdfunding.domain.entity.User;
 import com.crofle.livecrowdfunding.domain.enums.UserStatus;
 import com.crofle.livecrowdfunding.dto.request.*;
+import com.crofle.livecrowdfunding.repository.MakerRepository;
 import com.crofle.livecrowdfunding.repository.UserRepository;
 import com.crofle.livecrowdfunding.util.JwtUtil;
 import com.crofle.livecrowdfunding.domain.entity.AccountView;
@@ -40,6 +41,7 @@ public class AccountServiceImpl implements AccountService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final MakerRepository makerRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -52,6 +54,8 @@ public class AccountServiceImpl implements AccountService {
     @Value("${spring.security.oauth2.client.registration.naver.redirect-uri}")
     private String redirectUri;
 
+    private static final String RESET_TOKEN_PREFIX = "password_reset:";
+    private static final long RESET_TOKEN_EXPIRE_TIME = 15 * 60;
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 30 * 60 * 1000L;    // 30분
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;    // 7일
 
@@ -133,7 +137,6 @@ public class AccountServiceImpl implements AccountService {
     public Optional<AccountView> findEmailByNameAndPhone(AccountFindEmailRequestDTO request) {
         return accountViewRepository.findEmailByNameAndPhone(request.getName(), request.getPhone());
     }
-
     @Override
     public void sendResetPasswordEmail(AccountPasswordResetRequestDTO request) {
         String email = accountViewRepository.findEmailByNameAndMailAndPhone(
@@ -144,20 +147,100 @@ public class AccountServiceImpl implements AccountService {
 
         if (email != null) {
             String resetToken = jwtUtil.createPasswordResetToken(email);
+
+            // Redis에 토큰 저장 (unused 상태로) - 직접 저장 시도
+            String redisKey = RESET_TOKEN_PREFIX + resetToken;
+            try {
+                redisTemplate.opsForValue().set(redisKey, "unused", RESET_TOKEN_EXPIRE_TIME, TimeUnit.SECONDS);
+                log.info("Token stored in Redis: key={}, status=unused", redisKey);
+
+                // 저장 확인
+                String status = (String) redisTemplate.opsForValue().get(redisKey);
+                log.info("Verified token in Redis: key={}, status={}", redisKey, status);
+            } catch (Exception e) {
+                log.error("Failed to store token in Redis", e);
+                throw new RuntimeException("Failed to store reset token", e);
+            }
+
             String resetLink = String.format(
-                    "https://your-frontend-domain.com/reset-password?token=%s&email=%s",
+                    "http://localhost:5173/auth/reset-password?token=%s&email=%s",
                     resetToken, email
             );
 
             String subject = "비밀번호 재설정 안내";
             String content = String.format(
-                    "안녕하세요, %s님\n비밀번호 재설정을 위해 아래 링크를 클릭해주세요:\n%s\n링크는 15분간 유효합니다.",
+                    "<div style='margin:30px auto;max-width:600px;padding:20px;font-family:Arial,sans-serif;'>" +
+                            "<h2 style='color:#333;margin-bottom:20px;'>비밀번호 재설정 안내</h2>" +
+                            "<p style='color:#666;line-height:1.6;margin-bottom:20px;'>안녕하세요, %s님</p>" +
+                            "<p style='color:#666;line-height:1.6;margin-bottom:20px;'>아래 버튼을 클릭하여 비밀번호를 재설정해주세요.</p>" +
+                            "<a href='%s' style='display:inline-block;background-color:#007bff;color:#ffffff;text-decoration:none;" +
+                            "padding:12px 30px;border-radius:5px;margin:20px 0;'>비밀번호 재설정</a>" +
+                            "<p style='color:#999;font-size:14px;margin-top:20px;'>링크는 15분간 유효하며, 1회만 사용 가능합니다.</p>" +
+                            "<p style='color:#999;font-size:14px;'>본 메일은 발신전용입니다.</p>" +
+                            "</div>",
                     request.getName(), resetLink
             );
 
-            emailService.sendEmail(email, subject, content);
+            emailService.sendHtmlEmail(email, subject, content);
+            log.info("Password reset email sent to: {}", email);
+        } else {
+            log.warn("No user found with the provided information");
         }
     }
+
+    @Override
+    public boolean validateResetToken(String token) {
+        if (!jwtUtil.validateToken(token) || !jwtUtil.isPasswordResetToken(token)) {
+            log.warn("Invalid token or not a password reset token");
+            return false;
+        }
+
+        String redisKey = RESET_TOKEN_PREFIX + token;
+        String tokenStatus = (String) redisTemplate.opsForValue().get(redisKey);
+
+        if (tokenStatus == null) {
+            log.warn("Reset token not found in Redis: {}", token);
+            return false;
+        }
+
+        if (!"unused".equals(tokenStatus)) {
+            log.warn("Reset token already used: {}", token);
+            return false;
+        }
+
+        // 토큰 사용 처리
+        redisTemplate.opsForValue().set(redisKey, "used", RESET_TOKEN_EXPIRE_TIME, TimeUnit.SECONDS);
+        return true;
+    }
+
+    @Override
+    public void resetPassword(String token, String email, String newPassword) {
+        // 토큰 검증이 실패하면 예외 발생
+        if (!validateResetToken(token)) {
+            throw new IllegalArgumentException("Invalid or expired reset token");
+        }
+
+        // AccountView를 통해 사용자 정보 확인
+        AccountView accountView = accountViewRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // 암호화된 새 비밀번호
+        String encodedPassword = passwordEncoder.encode(newPassword);
+
+        // User나 Maker 테이블에 비밀번호 업데이트
+        if (accountView.getRole() == Role.USER) {
+            userRepository.updatePassword(accountView.getId(), encodedPassword);
+        } else if (accountView.getRole() == Role.MAKER) {
+            makerRepository.updatePassword(accountView.getId(), encodedPassword);
+        }
+
+        // 사용된 토큰 삭제
+        String redisKey = RESET_TOKEN_PREFIX + token;
+        redisTemplate.delete(redisKey);
+
+        log.info("Password successfully reset for user: {}", email);
+    }
+
 
     @Override
     public AccountTokenResponseDTO authenticateOAuthAccount(AccountOAuthRequestDTO request) {

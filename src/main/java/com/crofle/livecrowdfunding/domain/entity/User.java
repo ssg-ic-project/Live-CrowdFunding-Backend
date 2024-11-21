@@ -36,10 +36,10 @@ public class User {
     @Column(length = 10, nullable = false)
     private String birth;
 
-    @Column(length = 20, nullable = false, unique = true)
+    @Column(length = 255, nullable = false, unique = true)
     private String email;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 255, nullable = false)
     private String password;
 
     @Column(nullable = false)

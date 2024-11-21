@@ -2,6 +2,7 @@ package com.crofle.livecrowdfunding.repository;
 
 import com.crofle.livecrowdfunding.domain.entity.Project;
 import com.crofle.livecrowdfunding.domain.enums.ProjectStatus;
+import com.crofle.livecrowdfunding.dto.response.ProjectStatisticsResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -44,4 +45,34 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     // 펀딩 종료된 프로젝트 조회 (성공, 미달성)
     @Query("SELECT p FROM Project p WHERE p.progressProjectStatus IN :statuses")
     Page<Project> findByProgressStatuses(@Param("statuses") List<ProjectStatus> statuses, Pageable pageable);
+
+
+    //관리자 대시보드용
+    @Query("""
+            SELECT new com.crofle.livecrowdfunding.dto.response.ProjectStatisticsResponseDTO(
+                CAST((SELECT COUNT(p1.id) 
+                 FROM Project p1 
+                 WHERE DATE(p1.startAt) = CURRENT_DATE) AS Long),
+                 
+                CAST((SELECT COUNT(p2.id) 
+                 FROM Project p2 
+                 WHERE YEAR(p2.startAt) = YEAR(CURRENT_DATE) 
+                 AND MONTH(p2.startAt) = MONTH(CURRENT_DATE)) AS Long),
+                 
+                CAST((SELECT COUNT(p3.id) 
+                 FROM Project p3 
+                 WHERE YEAR(p3.startAt) = YEAR(CURRENT_DATE)) AS Long),
+                 
+                CAST((SELECT COUNT(p4.id) 
+                 FROM Project p4 
+                 WHERE p4.reviewProjectStatus = com.crofle.livecrowdfunding.domain.enums.ProjectStatus.검토중
+                 AND DATE(p4.startAt) = CURRENT_DATE) AS Long),
+                 
+                CAST((SELECT COUNT(p5.id) 
+                 FROM Project p5 
+                 WHERE p5.progressProjectStatus = com.crofle.livecrowdfunding.domain.enums.ProjectStatus.펀딩중)AS Long)
+            )
+            """)
+    ProjectStatisticsResponseDTO getProjectStatistics();
+
 }

@@ -26,6 +26,12 @@ public interface AccountService {
     // 비밀번호 재설정 이메일 발송
     void sendResetPasswordEmail(AccountPasswordResetRequestDTO request);
 
+    // 비밀번호 재설정 페이지 접근 전 토큰 검증
+    boolean validateResetToken(String token);
+
+    // 실제 비밀번호 재설정 처리
+    void resetPassword(String token, String email, String newPassword);
+
     // OAuth 로그인 및 계정 생성
     AccountTokenResponseDTO authenticateOAuthAccount(AccountOAuthRequestDTO request);
 

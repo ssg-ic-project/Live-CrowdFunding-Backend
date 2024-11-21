@@ -14,6 +14,7 @@ import org.hibernate.annotations.Immutable;
 @Table(name = "account_view")
 @Immutable
 public class AccountView {
+
     @Id
     private Long id;
     private String name;
@@ -23,4 +24,5 @@ public class AccountView {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
 }

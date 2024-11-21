@@ -1,6 +1,7 @@
 package com.crofle.livecrowdfunding.controller;
 
 import com.crofle.livecrowdfunding.dto.request.MakerInfoRequestDTO;
+import com.crofle.livecrowdfunding.dto.request.SaveMakerRequestDTO;
 import com.crofle.livecrowdfunding.dto.response.MakerInfoResponseDTO;
 import com.crofle.livecrowdfunding.service.MakerService;
 import lombok.Getter;
@@ -26,4 +27,10 @@ public class MakerController {
         makerService.updateMaker(id, makerInfoRequestDTO);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping
+    public ResponseEntity<SaveMakerRequestDTO> saveMaker(@RequestBody SaveMakerRequestDTO request) {
+        return ResponseEntity.ok(makerService.saveMaker(request));
+    }
 }
+

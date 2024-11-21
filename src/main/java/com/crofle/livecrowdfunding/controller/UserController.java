@@ -1,5 +1,6 @@
 package com.crofle.livecrowdfunding.controller;
 
+import com.crofle.livecrowdfunding.dto.request.SaveUserRequestDTO;
 import com.crofle.livecrowdfunding.dto.request.UserInfoRequestDTO;
 import com.crofle.livecrowdfunding.dto.response.UserInfoResponseDTO;
 import com.crofle.livecrowdfunding.service.UserService;
@@ -31,5 +32,10 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping
+    public ResponseEntity<SaveUserRequestDTO> saveUser(@RequestBody SaveUserRequestDTO request) {
+        return ResponseEntity.ok(userService.saveUser(request));
     }
 }

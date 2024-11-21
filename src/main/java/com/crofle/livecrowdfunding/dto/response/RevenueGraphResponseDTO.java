@@ -11,5 +11,5 @@ import java.util.List;
 @Setter
 public class RevenueGraphResponseDTO {
     private List<String> labels;
-    private List<MonthlyUserCountResponseDTO> revenue;
+    private List<MonthlyRevenueResponseDTO> revenue;
 }

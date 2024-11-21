@@ -1,5 +1,7 @@
 package com.crofle.livecrowdfunding.service;
 
+import com.crofle.livecrowdfunding.dto.request.SaveMakerRequestDTO;
+import com.crofle.livecrowdfunding.dto.request.SaveUserRequestDTO;
 import com.crofle.livecrowdfunding.dto.request.UserInfoRequestDTO;
 import com.crofle.livecrowdfunding.dto.response.UserInfoResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +19,7 @@ public class UserServiceTest {
 
     @Test
     public void findUserTest() {
-        Long userId = 1L;
+        Long userId = 7L;
 
         UserInfoResponseDTO userInfoResponseDTO = userService.findUser(userId);
 
@@ -45,5 +47,26 @@ public class UserServiceTest {
         Long userId = 9L;
 
         userService.deleteUser(userId);
+    }
+
+    @Test
+    public void saveUserTest() {
+        SaveUserRequestDTO saveUserRequestDTO=  new SaveUserRequestDTO();
+
+        saveUserRequestDTO.setName("곽하몰리이");
+        saveUserRequestDTO.setNickname("용바몰리이");
+        saveUserRequestDTO.setPhone("010-6558-9964");
+        saveUserRequestDTO.setGender(true);
+        saveUserRequestDTO.setBirth("1999");
+        saveUserRequestDTO.setEmail("a1s2d3f4@dsnaver.com");
+        saveUserRequestDTO.setPassword("1234");
+        saveUserRequestDTO.setZipcode(12345);
+        saveUserRequestDTO.setAddress("서울시 강남구");
+        saveUserRequestDTO.setDetailAddress("테헤란로 427");
+        saveUserRequestDTO.setLoginMethod(true);
+        saveUserRequestDTO.setNotification(true);
+        saveUserRequestDTO.setCategoryIds(null);
+
+        userService.saveUser(saveUserRequestDTO);
     }
 }

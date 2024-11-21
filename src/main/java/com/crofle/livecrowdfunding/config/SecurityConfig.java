@@ -60,6 +60,8 @@ public class SecurityConfig {
 //                        .requestMatchers("/api/oauth2/**").permitAll()
 //                        .requestMatchers("/login/oauth2/code/**").permitAll()
 //                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+//                        .requestMatchers("/api/dashboard/**").permitAll()
+//                        .requestMatchers("/api/admin-account/**").permitAll()
 //                        .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
@@ -79,9 +81,9 @@ public class SecurityConfig {
                                                 HttpServletResponse response,
                                                 AuthenticationException exception) throws IOException {
                 log.error("OAuth2 authentication failed: ", exception);
-                String targetUrl = "http://localhost:5173/login?error=" +
-                        URLEncoder.encode(exception.getMessage(), StandardCharsets.UTF_8);
-                getRedirectStrategy().sendRedirect(request, response, targetUrl);
+//                String targetUrl = "http://localhost:5173/login?error=" +
+//                        URLEncoder.encode(exception.getMessage(), StandardCharsets.UTF_8);
+//                getRedirectStrategy().sendRedirect(request, response, targetUrl);
             }
         };
     }

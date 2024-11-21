@@ -6,12 +6,23 @@ import com.crofle.livecrowdfunding.dto.request.*;
 import com.crofle.livecrowdfunding.dto.response.AccountTokenResponseDTO;
 import com.crofle.livecrowdfunding.util.JwtUtil;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import static org.junit.jupiter.api.Assertions.*;import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 
 @SpringBootTest
@@ -20,6 +31,9 @@ import static org.junit.jupiter.api.Assertions.*;import org.springframework.bean
 public class LoginServiceTest {
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -31,6 +45,7 @@ public class LoginServiceTest {
     private final String TEST_MAKER_EMAIL = "bbbb@bbb.com";
     private final String TEST_OAUTH_EMAIL = "oauth@test.com";
     private final String TEST_PASSWORD = "1234";
+
 
     @Test
     @DisplayName("일반 사용자 로그인 성공 테스트")
@@ -184,12 +199,29 @@ public class LoginServiceTest {
 
         log.info("\n===== 토큰 갱신 테스트 종료 =====\n");
     }
+    @BeforeEach
+    void setUp() {
+        try {
+            redisTemplate.getConnectionFactory().getConnection().ping();
+            log.info("Redis connection successful");
+
+            Set<String> keys = redisTemplate.keys("password_reset:*");
+            if (keys != null && !keys.isEmpty()) {
+                redisTemplate.delete(keys);
+                log.info("Cleaned up {} existing test tokens", keys.size());
+            }
+        } catch (Exception e) {
+            log.error("Redis connection failed", e);
+            fail("Redis connection failed: " + e.getMessage());
+        }
+    }
 
     @Test
-    @DisplayName("이메일 발송 테스트")
-    public void resetPasswordTest() {
+    @DisplayName("비밀번호 재설정 이메일 발송 및 토큰 저장 테스트")
+    public void resetPasswordEmailTest() {
         log.info("\n\n===== 비밀번호 재설정 이메일 발송 테스트 시작 =====\n");
 
+        // Given
         AccountPasswordResetRequestDTO request = AccountPasswordResetRequestDTO.builder()
                 .email("firstsm41@naver.com")
                 .name("최성민")
@@ -198,11 +230,76 @@ public class LoginServiceTest {
 
         log.info("비밀번호 재설정 이메일 발송 요청: {}\n", request);
 
-        assertDoesNotThrow(() -> accountService.sendResetPasswordEmail(request));
+        // When
+        accountService.sendResetPasswordEmail(request);
+        log.info("이메일 발송 완료");
+
+        // Then
+        boolean tokenFound = false;
+        Set<String> keys = null;
+
+        for (int i = 0; i < 6; i++) {
+            keys = redisTemplate.keys("password_reset:*");
+            log.info("Attempt {}: Found {} keys", i + 1, keys != null ? keys.size() : 0);
+
+            if (keys != null && !keys.isEmpty()) {
+                tokenFound = true;
+                break;
+            }
+
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        // 토큰 저장 확인
+        assertTrue(tokenFound, "Redis에 토큰이 저장되지 않았습니다.");
+        assertNotNull(keys, "Redis keys가 null입니다.");
+        assertFalse(keys.isEmpty(), "Redis에 저장된 토큰이 없습니다.");
+
+        // 저장된 토큰의 첫 번째 키 가져오기
+        String storedTokenKey = keys.iterator().next();
+        log.info("Found token key: {}", storedTokenKey);
+
+        // 토큰 상태 확인
+        String tokenStatus = (String) redisTemplate.opsForValue().get(storedTokenKey);
+        assertEquals("unused", tokenStatus, "토큰의 상태가 'unused'가 아닙니다.");
+        log.info("Token status verified: {}", tokenStatus);
+
+        // 토큰 만료 시간 확인
+        Long ttl = redisTemplate.getExpire(storedTokenKey);
+        assertTrue(ttl > 0, "토큰의 만료 시간이 설정되지 않았습니다.");
+        log.info("Token TTL: {} seconds", ttl);
 
         log.info("\n===== 비밀번호 재설정 이메일 발송 테스트 종료 =====\n");
     }
 
+    @Test
+    @DisplayName("저장된 재설정 토큰 검증 테스트")
+    public void validateStoredResetTokenTest() {
+        // Given
+        AccountPasswordResetRequestDTO request = AccountPasswordResetRequestDTO.builder()
+                .email("firstsm41@naver.com")
+                .name("최성민")
+                .phone("010-7529-0837")
+                .build();
 
+        // 토큰 생성 및 저장
+        accountService.sendResetPasswordEmail(request);
+
+        // 저장된 토큰 찾기
+        Set<String> keys = redisTemplate.keys("password_reset:*");
+        assertTrue(keys != null && !keys.isEmpty(), "토큰이 저장되지 않았습니다.");
+
+        String storedTokenKey = keys.iterator().next();
+        String token = storedTokenKey.replace("password_reset:", "");
+
+        // When & Then
+        assertTrue(accountService.validateResetToken(token), "토큰 검증에 실패했습니다.");
+        assertFalse(accountService.validateResetToken(token), "사용된 토큰이 재사용 가능합니다.");
+    }
 
 }

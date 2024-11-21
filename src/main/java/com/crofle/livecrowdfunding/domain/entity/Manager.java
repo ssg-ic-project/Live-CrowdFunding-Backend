@@ -23,13 +23,13 @@ public class Manager {
     @Column(name = "identification_number", length = 20, nullable = false)
     private String identificationNumber;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 255, nullable = false)
     private String email;
 
     @Column(length = 20, nullable = false)
     private String phone;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 255, nullable = false)
     private String password;
 
     @Column(name = "registered_at", nullable = false, updatable = false)

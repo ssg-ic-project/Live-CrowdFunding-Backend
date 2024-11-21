@@ -30,12 +30,11 @@ public class NaverOAuthTest {
 
             // 2. 사용자 안내
             printMessage("\n==============================================");
-            printMessage("1. 아래 URL을 브라우저에 복사하여 접속하세요:");
+            printMessage("1. 아래 URL을 브라우저에 복사");
             printMessage(authUrl);
-            printMessage("\n2. 네이버 로그인을 진행하세요.");
-            printMessage("\n3. 리다이렉트된 URL에서 'code' 파라미터 값을 복사하세요.");
+            printMessage("\n3. 리다이렉트된 URL의 'code' 파라미터 값 복사");
             printMessage("예: http://localhost:8080/login/oauth2/code/naver?code=ABCD1234&state=randomstate123");
-            printMessage("\n4. 복사한 코드값을 아래에 입력하고 엔터를 누르세요:");
+            printMessage("\n4. 복사한 코드값 입력");
             printMessage("==============================================\n");
 
             // 3. 사용자 입력 받기
