@@ -51,6 +51,6 @@ jobs:
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker pull ${{ secrets.DOCKER_USERNAME }}/spring-app
             cd /app
-            docker-compose down || true
-            docker compose up -d || true
+            docker-compose down
+            docker compose up -d
           '
