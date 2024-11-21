@@ -46,8 +46,8 @@ jobs:
         username: ${{ secrets.BASTION_USERNAME }}
         password: ${{secrets.REMOTE_SSH_KEY}}
         script: |
-            apt-get update && apt-get install -y sshpass
-            sshpass -p "${{ secrets.PRIVATE_INSTANCE_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.PRIVATE_INSTANCE_USERNAME }}@${{ secrets.PRIVATE_INSTANCE_IP }} '
+          apt-get update && apt-get install -y sshpass
+          sshpass -p "${{ secrets.PRIVATE_INSTANCE_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.PRIVATE_INSTANCE_USERNAME }}@${{ secrets.PRIVATE_INSTANCE_IP }} '
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker pull ${{ secrets.DOCKER_USERNAME }}/spring-app
             cd /app
