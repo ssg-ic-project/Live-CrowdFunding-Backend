@@ -1,8 +1,8 @@
 package com.crofle.livecrowdfunding.domain.enums;
 
 public enum DocumentType {
-    프로젝트,
-    개발,
+    상품정보,
+    펀딩정보,
     개인정보,
     추가
 }

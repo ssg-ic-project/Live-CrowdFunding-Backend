@@ -54,12 +54,12 @@ public class ProjectServiceTest {
                  .essentialDocuments(List.of(
                          DocumentRegisterRequestDTO.builder()
                                  .url("document1.pdf")
-                                 .docType(DocumentType.개발)
+                                 .docType(DocumentType.상품정보)
                                  .name("필수문서1")
                                  .build(),
                          DocumentRegisterRequestDTO.builder()
                                  .url("document2.pdf")
-                                 .docType(DocumentType.프로젝트)
+                                 .docType(DocumentType.펀딩정보)
                                  .name("필수문서2")
                                  .build()
                  ))
@@ -120,12 +120,12 @@ public class ProjectServiceTest {
                 .essentialDocuments(List.of(
                         DocumentRegisterRequestDTO.builder()
                                 .url("변경된document1.pdf")
-                                .docType(DocumentType.개발)
+                                .docType(DocumentType.상품정보)
                                 .name("필수문서1")
                                 .build(),
                         DocumentRegisterRequestDTO.builder()
                                 .url("변경된document2.pdf")
-                                .docType(DocumentType.프로젝트)
+                                .docType(DocumentType.펀딩정보)
                                 .name("필수문서2")
                                 .build()
                 ))
