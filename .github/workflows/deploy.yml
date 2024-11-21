@@ -49,8 +49,8 @@ jobs:
           apt-get update && apt-get install -y sshpass
           sshpass -p "${{ secrets.PRIVATE_INSTANCE_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.PRIVATE_INSTANCE_USERNAME }}@${{ secrets.PRIVATE_INSTANCE_IP }} '
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            docker pull ${{ secrets.DOCKER_USERNAME }}/spring-app
-            cd /app
-            docker-compose down
-            docker compose up -d
+            docker pull ${{ secrets.DOCKER_USERNAME }}/spring-server
+            cd /root/app
+            docker-compose down || true
+            docker compose up -d || true
           '
