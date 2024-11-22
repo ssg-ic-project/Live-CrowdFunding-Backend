@@ -55,5 +55,8 @@ public class ProjectController {
     }
 
     // 메인 페이지
-
+    @GetMapping("/main")
+    public ResponseEntity<ProjectMainResponseDTO> getMainProjectList() {
+        return ResponseEntity.ok(projectService.getMainProjects());
+    }
 }
