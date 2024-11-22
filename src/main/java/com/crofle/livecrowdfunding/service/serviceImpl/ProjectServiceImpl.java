@@ -249,6 +249,11 @@ public class ProjectServiceImpl implements ProjectService {
                 .build();
     }
 
+    @Override
+    public List<ProjectLiveVODResponseDTO> getLiveAndVODProjectList() {
+        return projectRepository.findLiveAndVODProjectList();
+    }
+
     private PageListResponseDTO<ProjectListResponseDTO> getProjectListResponseDTOPageListResponseDTO(PageRequestDTO pageRequestDTO, Page<Project> projects) {
         return PageListResponseDTO.<ProjectListResponseDTO>builder()
                 .dataList(projects.stream()

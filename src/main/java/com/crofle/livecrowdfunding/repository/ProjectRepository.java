@@ -3,6 +3,7 @@ package com.crofle.livecrowdfunding.repository;
 import com.crofle.livecrowdfunding.domain.entity.Project;
 import com.crofle.livecrowdfunding.domain.enums.ProjectStatus;
 import com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO;
+import com.crofle.livecrowdfunding.dto.response.ProjectLiveVODResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.ProjectStatisticsResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.TopFundingInMainResponseDTO;
 import org.springframework.data.domain.Page;
@@ -50,17 +51,23 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<Project> findByProgressStatuses(@Param("statuses") List<ProjectStatus> statuses, Pageable pageable);
 
     // 메인 화면에서 라이브중인 프로젝트 조회
-    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO(i.url, p.productName, p.percentage, m.name, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long)) FROM Project p " +
-            "JOIN p.schedules s LEFT JOIN p.images i LEFT JOIN p.maker m " +
-            "WHERE s.isStreaming = true and i.imageNumber = 1 " +
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO(i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long)) FROM Project p " +
+            "JOIN p.schedules s LEFT JOIN p.images i " +
+            "WHERE s.isStreaming = true AND i.imageNumber = 1 " +
             "ORDER BY s.totalViewer DESC")
     List<LiveFundingInMainResponseDTO> findLiveFundingInMain();
 
-    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.TopFundingInMainResponseDTO(t.ranking, i.url, p.productName, p.percentage, m.name, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long)) FROM Project p " +
-            "JOIN p.topFundings t LEFT JOIN p.images i LEFT JOIN p.maker m " +
-            "WHERE i.imageNumber = 1 and t.updatedAt = :today " +
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.TopFundingInMainResponseDTO(t.ranking, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long)) FROM Project p " +
+            "JOIN p.topFundings t LEFT JOIN p.images i " +
+            "WHERE i.imageNumber = 1 AND t.updatedAt = :today " +
             "ORDER BY t.ranking ASC")
     List<TopFundingInMainResponseDTO> findTopFundingInMain(@Param("today") LocalDateTime today);
+
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectLiveVODResponseDTO(p.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long), s.isStreaming) FROM Project p " +
+            "JOIN p.schedules s LEFT JOIN p.images i LEFT JOIN p.maker m LEFT JOIN s.video v " +
+            "WHERE i.imageNumber = 1 and p.progressProjectStatus = '펀딩중' AND (s.isStreaming = true OR v.mediaUrl IS NOT NULL )" +
+            "ORDER BY s.date DESC")
+    List<ProjectLiveVODResponseDTO> findLiveAndVODProjectList();
 
     //관리자 대시보드용
     @Query("""

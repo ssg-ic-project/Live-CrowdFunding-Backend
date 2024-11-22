@@ -59,4 +59,9 @@ public class ProjectController {
     public ResponseEntity<ProjectMainResponseDTO> getMainProjectList() {
         return ResponseEntity.ok(projectService.getMainProjects());
     }
+
+    @GetMapping("/live-vod")
+    public ResponseEntity<List<ProjectLiveVODResponseDTO>> getLiveAndVODProjectList() {
+        return ResponseEntity.ok(projectService.getLiveAndVODProjectList());
+    }
 }

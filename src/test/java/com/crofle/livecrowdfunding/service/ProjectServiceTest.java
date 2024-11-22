@@ -149,4 +149,10 @@ public class ProjectServiceTest {
         ProjectMainResponseDTO projectMainResponseDTO = projectService.getMainProjects();
         log.info(projectMainResponseDTO);
     }
+
+    @Test
+    public void testFindLiveAndVODProjectList() {
+        List<ProjectLiveVODResponseDTO> projectLiveVODResponseDTOList = projectService.getLiveAndVODProjectList();
+        log.info(projectLiveVODResponseDTOList);
+    }
 }

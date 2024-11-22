@@ -1,6 +1,7 @@
 package com.crofle.livecrowdfunding.service;
 
 
+import com.crofle.livecrowdfunding.domain.entity.Project;
 import com.crofle.livecrowdfunding.dto.request.*;
 import com.crofle.livecrowdfunding.dto.response.*;
 
@@ -23,4 +24,6 @@ public interface ProjectService {
     PageListResponseDTO<ProjectListResponseDTO> getProjectList(ProjectListRequestDTO requestDTO, PageRequestDTO pageRequestDTO);
 
     ProjectMainResponseDTO getMainProjects();
+
+    List<ProjectLiveVODResponseDTO> getLiveAndVODProjectList();
 }
