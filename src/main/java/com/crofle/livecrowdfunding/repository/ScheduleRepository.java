@@ -1,12 +1,14 @@
 package com.crofle.livecrowdfunding.repository;
 
 import com.crofle.livecrowdfunding.domain.entity.Schedule;
+import com.crofle.livecrowdfunding.dto.response.ScheduleChartResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.YesterdayStreamingResponseDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query("SELECT s.date " +
@@ -30,4 +32,11 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             
             """)
     List<YesterdayStreamingResponseDTO> findYesterdaySStats(@Param("yesterday") LocalDateTime yesterday);
+
+    @Query(
+            "SELECT p.id, s.date, p.productName, m.name, p.percentage, p.price, i.url FROM Schedule s " +
+            "JOIN s.project p LEFT JOIN p.images i LEFT JOIN p.maker m " +
+            "WHERE s.date >= :startDate AND s.date <= :endDate AND i.imageNumber = 1 " +
+            "AND s.project.id = p.id")
+    List<Object[]> findScheduleChart(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

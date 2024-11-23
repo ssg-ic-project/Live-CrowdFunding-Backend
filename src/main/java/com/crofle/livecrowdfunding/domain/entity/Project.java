@@ -118,6 +118,10 @@ public class Project {
     @Builder.Default
     private List<EssentialDocument> essentialDocuments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<TopFunding> topFundings = new ArrayList<>();
+
     @OneToOne(mappedBy = "project", cascade = CascadeType.ALL)
     private Revenue revenue;
 
