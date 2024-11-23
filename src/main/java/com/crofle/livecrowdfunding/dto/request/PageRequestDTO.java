@@ -39,6 +39,8 @@ public class PageRequestDTO {
     //User 관리용
     private String userName;
 
+    //카테고리 관리용 (카테고리 확장 시 ENUM으로 변경하는 것이 좋을듯)
+    private Long categoryId;
 
     public int getOffset(){
         return (page - 1) * 10;

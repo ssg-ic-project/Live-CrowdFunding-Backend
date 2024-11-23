@@ -254,6 +254,31 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.findLiveAndVODProjectList();
     }
 
+    @Override
+    public PageListResponseDTO<ProjectWithConditionResponseDTO> getCategoryProjects(Long categoryId, PageRequestDTO pageRequestDTO) {
+        Page<ProjectWithConditionResponseDTO> projectPage = projectRepository.findByCategoryIdProject(categoryId, pageRequestDTO.getPageable());
+        return PageListResponseDTO.<ProjectWithConditionResponseDTO>builder()
+                .dataList(projectPage.getContent())
+                .pageInfoDTO(PageInfoDTO.withAll()
+                        .pageRequestDTO(pageRequestDTO)
+                        .total((int) projectPage.getTotalElements())
+                        .build())
+                .build();
+    }
+
+    @Override
+    public PageListResponseDTO<ProjectWithConditionResponseDTO> getSearchProjects(String keyword, PageRequestDTO pageRequestDTO) {
+        Page<ProjectWithConditionResponseDTO> projectPage = projectRepository.findByKeywordProject(keyword, pageRequestDTO.getPageable());
+        return PageListResponseDTO.<ProjectWithConditionResponseDTO>builder()
+                .dataList(projectPage.getContent())
+                .pageInfoDTO(PageInfoDTO.withAll()
+                        .pageRequestDTO(pageRequestDTO)
+                        .total((int) projectPage.getTotalElements())
+                        .build())
+                .build();
+    }
+
+
     private PageListResponseDTO<ProjectListResponseDTO> getProjectListResponseDTOPageListResponseDTO(PageRequestDTO pageRequestDTO, Page<Project> projects) {
         return PageListResponseDTO.<ProjectListResponseDTO>builder()
                 .dataList(projects.stream()

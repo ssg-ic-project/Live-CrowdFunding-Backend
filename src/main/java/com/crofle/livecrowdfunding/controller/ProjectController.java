@@ -64,4 +64,14 @@ public class ProjectController {
     public ResponseEntity<List<ProjectLiveVODResponseDTO>> getLiveAndVODProjectList() {
         return ResponseEntity.ok(projectService.getLiveAndVODProjectList());
     }
+
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<PageListResponseDTO<ProjectWithConditionResponseDTO>> getCategoryProjects(@PathVariable Long categoryId, @ModelAttribute PageRequestDTO pageRequestDTO) {
+        return ResponseEntity.ok(projectService.getCategoryProjects(categoryId, pageRequestDTO));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<PageListResponseDTO<ProjectWithConditionResponseDTO>> getSearchProjects(@RequestParam String keyword, @ModelAttribute PageRequestDTO pageRequestDTO) {
+        return ResponseEntity.ok(projectService.getSearchProjects(keyword, pageRequestDTO));
+    }
 }

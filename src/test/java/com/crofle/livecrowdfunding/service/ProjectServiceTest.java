@@ -155,4 +155,18 @@ public class ProjectServiceTest {
         List<ProjectLiveVODResponseDTO> projectLiveVODResponseDTOList = projectService.getLiveAndVODProjectList();
         log.info(projectLiveVODResponseDTOList);
     }
+
+    @Test
+    public void testFindCategoryProjects() {
+        Long categoryId = 1L;
+        PageListResponseDTO<ProjectWithConditionResponseDTO> dto = projectService.getCategoryProjects(categoryId, PageRequestDTO.builder().page(1).size(2).build());
+        log.info(dto);
+    }
+
+    @Test
+    public void testFindSearchProjects() {
+        String keyword = "싸디";
+        PageListResponseDTO<ProjectWithConditionResponseDTO> dto = projectService.getSearchProjects(keyword, PageRequestDTO.builder().page(1).size(2).build());
+        log.info(dto);
+    }
 }
