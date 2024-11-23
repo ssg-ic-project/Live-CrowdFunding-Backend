@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TopFundingInMainResponseDTO {
+    private Long id;
     private Integer ranking;
     private String url;
     private String productName;

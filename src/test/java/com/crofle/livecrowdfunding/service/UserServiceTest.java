@@ -17,7 +17,7 @@ public class UserServiceTest {
 
     @Test
     public void findUserTest() {
-        Long userId = 7L;
+        Long userId = 1L;
 
         UserInfoResponseDTO userInfoResponseDTO = userService.findUser(userId);
 
@@ -42,7 +42,7 @@ public class UserServiceTest {
 
     @Test
     public void deleteUserTest() {
-        Long userId = 9L;
+        Long userId = 6L;
 
         userService.deleteUser(userId);
     }
