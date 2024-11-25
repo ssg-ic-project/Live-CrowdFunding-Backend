@@ -1,6 +1,9 @@
 package com.crofle.livecrowdfunding.controller;
 
+import com.crofle.livecrowdfunding.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
@@ -12,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,26 +24,45 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Base64;
 
-@Controller
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api")
+@Log4j2
 public class WidgetController {
-
+    private final PaymentService paymentService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @RequestMapping(value = "/confirm")
     public ResponseEntity<JSONObject> confirmPayment(@RequestBody String jsonBody) throws Exception {
 
         JSONParser parser = new JSONParser();
-        String orderId;
+        String orderId; //주문 테이블에서 가지고 온 값임.
         String amount;
         String paymentKey;
+        String method;
+        String deliveryAddress;
+        String paymentAt;
+
         try {
             // 클라이언트에서 받은 JSON 요청 바디입니다.
             JSONObject requestData = (JSONObject) parser.parse(jsonBody);
             paymentKey = (String) requestData.get("paymentKey");
             orderId = (String) requestData.get("orderId");
             amount = (String) requestData.get("amount");
+            paymentAt = (String) requestData.get("approvedAt");
+            method = (String) requestData.get("method");
+            deliveryAddress = (String) requestData.get("deliveryAddress");
+
+//            log.info("checking from backend yejina");
+//            log.info(amount);
+//            log.info(orderId);
+//            log.info(method);
+            log.info(deliveryAddress);
+//            log.info(paymentAt);
+
         } catch (ParseException e) {
             throw new RuntimeException(e);
         };
@@ -47,6 +70,7 @@ public class WidgetController {
         obj.put("orderId", orderId);
         obj.put("amount", amount);
         obj.put("paymentKey", paymentKey);
+        obj.put("paymentAt", paymentAt);
 
         // TODO: 개발자센터에 로그인해서 내 결제위젯 연동 키 > 시크릿 키를 입력하세요. 시크릿 키는 외부에 공개되면 안돼요.
         // @docs https://docs.tosspayments.com/reference/using-api/api-keys
@@ -76,11 +100,19 @@ public class WidgetController {
         int code = connection.getResponseCode();
         boolean isSuccess = code == 200;
 
+
         InputStream responseStream = isSuccess ? connection.getInputStream() : connection.getErrorStream();
 
         // TODO: 결제 성공 및 실패 비즈니스 로직을 구현하세요.
         Reader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
         JSONObject jsonObject = (JSONObject) parser.parse(reader);
+
+        log.info("checking yejina from backend: ");
+        log.info(jsonObject);
+
+        //db에 저장하기
+        paymentService.insertPaymentHistory(jsonObject, deliveryAddress);
+
         responseStream.close();
 
         return ResponseEntity.status(code).body(jsonObject);
