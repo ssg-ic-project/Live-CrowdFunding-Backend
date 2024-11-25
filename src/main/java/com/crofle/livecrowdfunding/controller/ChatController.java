@@ -1,6 +1,9 @@
 package com.crofle.livecrowdfunding.controller;
 
 import com.crofle.livecrowdfunding.dto.ChatMessageDTO;
+import com.crofle.livecrowdfunding.dto.request.CreateChatReportRequest;
+import com.crofle.livecrowdfunding.dto.response.ReportResponseDTO;
+import com.crofle.livecrowdfunding.service.ChatReportService;
 import com.crofle.livecrowdfunding.service.ChatService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
@@ -29,20 +32,20 @@ public class ChatController {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChatService chatService;
 //    private final BlockService blockService;
-//    private final ChatReportService chatReportService;
+    private final ChatReportService chatReportService;
 
     public ChatController(
             @Qualifier("chatRedisTemplate") RedisTemplate<String, Object> redisTemplate,
             ChatService chatService,
-            ObjectMapper objectMapper
+            ObjectMapper objectMapper,
 //            BlockService blockService,
-//            ChatReportService chatReportService
+            ChatReportService chatReportService
     ) {
         this.redisTemplate = redisTemplate;
         this.chatService = chatService;
         this.objectMapper = objectMapper;
 //        this.blockService = blockService;
-//        this.chatReportService = chatReportService;
+        this.chatReportService = chatReportService;
     }
 
     @MessageMapping("/chat/message")
@@ -115,15 +118,24 @@ public class ChatController {
 //        return ResponseEntity.ok(blockedUsers);
 //    }
 //
-    // 채팅 신고
-//    @PostMapping("/chat-reports")
-//    public ResponseEntity<ChatReportDTO> reportChat(
-//            @Valid @RequestBody CreateChatReportRequest request,
+//     채팅 신고
+
+    /**
+     * 채팅 신고
+     * @param request
+//     * @param userDetails
+     * @return
+     */
+    @PostMapping("/chat/report")
+    public ResponseEntity<ReportResponseDTO> reportChat(
+            @Valid @RequestBody CreateChatReportRequest request
 //            @AuthenticationPrincipal UserDetails userDetails
-//    ) {
-//        ChatReportDTO report = chatReportService.createReport(request, userDetails.getUsername());
-//        return ResponseEntity.ok(report);
-//    }
+    ) {
+
+        log.info(request.toString());
+        ReportResponseDTO report = chatReportService.createReport(request);
+        return ResponseEntity.ok(report);
+    }
 
     private void saveChatMessage(String roomId, ChatMessageDTO message) {
         String key = "chat:room:" + roomId;

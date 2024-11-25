@@ -25,6 +25,7 @@ public class ChatServiceImpl implements ChatService {
         // 비속어 사전 초기화
         Trie.TrieBuilder builder = Trie.builder()
 //                .onlyWholeWords()     // 전체 단어만 매치
+                .ignoreOverlaps()
                 .ignoreCase();        // 대소문자 무시
 
         // 비속어 목록 추가

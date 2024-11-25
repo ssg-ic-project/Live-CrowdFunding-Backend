@@ -1,6 +1,7 @@
 package com.crofle.livecrowdfunding.service;
 
 
+import com.crofle.livecrowdfunding.domain.entity.Project;
 import com.crofle.livecrowdfunding.dto.request.*;
 import com.crofle.livecrowdfunding.dto.response.*;
 

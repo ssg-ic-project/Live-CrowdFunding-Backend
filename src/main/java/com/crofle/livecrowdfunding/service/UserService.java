@@ -19,6 +19,4 @@ public interface UserService {
 
 
      SaveUserRequestDTO saveUser(SaveUserRequestDTO saveUserRequestDTO);
-
-;
 }
