@@ -44,6 +44,9 @@ dependencies {
     implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.1.1'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // https://mvnrepository.com/artifact/org.ahocorasick/ahocorasick
+    implementation 'org.ahocorasick:ahocorasick:0.6.3'
+
     //oauth2
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
