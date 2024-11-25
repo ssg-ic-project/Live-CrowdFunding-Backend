@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -26,7 +24,7 @@ public class ChatServiceImpl implements ChatService {
     public void initialize() {
         // 비속어 사전 초기화
         Trie.TrieBuilder builder = Trie.builder()
-                .onlyWholeWords()     // 전체 단어만 매치
+//                .onlyWholeWords()     // 전체 단어만 매치
                 .ignoreCase();        // 대소문자 무시
 
         // 비속어 목록 추가
@@ -50,18 +48,43 @@ public class ChatServiceImpl implements ChatService {
     }
 
     public String filterProfanity(String content) {
-        Collection<Emit> emits = trie.parseText(content);
+        String normalizedContent = content.replaceAll("\\s+", "");
+        Collection<Emit> emits = trie.parseText(normalizedContent);
 
-        // 원본 문자열을 char 배열로 변환
-        char[] chars = content.toCharArray();
+        if (emits.isEmpty()) {
+            log.info("No profanity found in: '{}'", content);
+            return content;
+        }
 
-        // 매칭된 모든 비속어를 '*'로 치환
-        for (Emit emit : emits) {
-            for (int i = emit.getStart(); i < emit.getEnd(); i++) {
-                chars[i] = '*';
+        // 원본 문자열에서 매칭된 위치 조정을 위한 매핑
+        Map<Integer, Integer> positionMap = new HashMap<>();
+        int normalizedPos = 0;
+        for (int originalPos = 0; originalPos < content.length(); originalPos++) {
+            if (!Character.isWhitespace(content.charAt(originalPos))) {
+                positionMap.put(normalizedPos++, originalPos);
             }
         }
 
-        return new String(chars);
+        // 원본 문자열 유지
+        StringBuilder result = new StringBuilder(content);
+
+        // 역순으로 처리하여 인덱스 변화 방지
+        List<Emit> emitList = new ArrayList<>(emits);
+        emitList.sort((e1, e2) -> Integer.compare(e2.getStart(), e1.getStart()));
+
+        for (Emit emit : emitList) {
+            int originalStart = positionMap.get(emit.getStart());
+            int originalEnd = positionMap.get(emit.getEnd() - 1) + 1;
+            String matchedText = content.substring(originalStart, originalEnd);
+            String stars = "*".repeat(matchedText.length());
+
+            log.info("Found profanity: '{}' at positions {}-{}",
+                    matchedText, originalStart, originalEnd);
+            result.replace(originalStart, originalEnd, stars);
+        }
+
+        String filtered = result.toString();
+        log.info("Filtered result: '{}'", filtered);
+        return filtered;
     }
 }
