@@ -79,6 +79,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<Object[]> countMonthlyCurrentTotal(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     @Modifying
+    @Transactional
     @Query("UPDATE User u SET u.password = :password WHERE u.id = :id")
-    void updatePassword(@Param("id") Long id, @Param("password") String password);
+    void updatePassword(@Param("id") Long id, @Param("password") String password);;
 }
