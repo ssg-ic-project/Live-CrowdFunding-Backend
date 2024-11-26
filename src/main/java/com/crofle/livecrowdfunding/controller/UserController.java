@@ -22,7 +22,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findUser(id));
     }
 
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Void> updateUser(@PathVariable Long id, @RequestBody UserInfoRequestDTO userInfoRequestDTO) {
         userService.updateUser(id, userInfoRequestDTO);
         return ResponseEntity.ok().build();

@@ -86,7 +86,6 @@ public class User {
     private List<ChatReport> chatReports = new ArrayList<>();
 
     public void updateUserInfo(UserInfoRequestDTO userInfoRequestDTO) {
-        this.name = userInfoRequestDTO.getName();
         this.nickname = userInfoRequestDTO.getNickname();
         this.phone = userInfoRequestDTO.getPhone();
         this.address = userInfoRequestDTO.getAddress();

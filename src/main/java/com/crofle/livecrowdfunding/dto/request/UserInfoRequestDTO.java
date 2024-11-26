@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserInfoRequestDTO { // 사용자 정보 수정 요청
-    private String name;
     private String nickname;
     private String phone;
     private String address;
