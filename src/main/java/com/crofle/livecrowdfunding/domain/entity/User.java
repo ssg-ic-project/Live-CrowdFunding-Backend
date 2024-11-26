@@ -74,7 +74,7 @@ public class User {
     private List<UserInterest> interests = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Liked> likes = new ArrayList<>();
 
     @Builder.Default
