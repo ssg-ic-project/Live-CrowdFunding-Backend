@@ -14,7 +14,7 @@ public class SaveMakerRequestDTO {
     private Long id;
     private String name;
     private String phone;
-    private Integer business;
+    private Long business;
     private String email;
     private String password;
     private Integer zipcode;
