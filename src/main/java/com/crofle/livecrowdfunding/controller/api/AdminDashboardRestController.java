@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @Log4j2
@@ -23,9 +24,8 @@ public class AdminDashboardRestController {
 
     //refactoring시: 동시성 제어 사용시 axios사용??
     @GetMapping("/dashboard/stats")
-    public ResponseEntity<StatisticsResponseDTO>getStats(){
-
-        return null;
+    public ResponseEntity<ProjectStatisticsResponseDTO>getStats(){
+        return ResponseEntity.ok(dashBoardService.getProjectStatistics());
     }
 
     //월별(최근 12개월) 신규 가입자 수 (일반회원, 메이커, 총계)
@@ -45,7 +45,7 @@ public class AdminDashboardRestController {
     public ResponseEntity<RevenueGraphResponseDTO>getTotalRevenue(){
         RevenueGraphResponseDTO revenueStats = RevenueGraphResponseDTO.builder()
                 .labels(dashBoardService.getLast12Months())
-                .revenue(dashBoardService.getNewTotalStats(oneYearAgo, now))
+                .revenue(dashBoardService.getRevenueStats(oneYearAgo))
                 .build();
 
         return ResponseEntity.ok(revenueStats);
@@ -68,8 +68,19 @@ public class AdminDashboardRestController {
         return ResponseEntity.ok(userStats);
     }
 
-    @GetMapping("/dashboard/GraphE")
+    //카테고리별 펀딩 수와 수익
+    @GetMapping("/dashboard/revenue-by-category")
     public ResponseEntity<CategoryRevenueResponseDTO>getCategoryRevenue(){
-        return null;
+        CategoryRevenueResponseDTO result = CategoryRevenueResponseDTO.builder()
+                .catrevenue(dashBoardService.getCategoryStats())
+                .build();
+
+        return ResponseEntity.ok(result);
+    }
+
+    //스트리밍 프로젝트 별 구매자, 시청수
+    @GetMapping("/dashboard/streaming-stats")
+    public ResponseEntity<List<YesterdayStreamingResponseDTO>>getYesterdayStreamingStats(){
+        return ResponseEntity.ok(dashBoardService.getYesterdaySStats());
     }
 }

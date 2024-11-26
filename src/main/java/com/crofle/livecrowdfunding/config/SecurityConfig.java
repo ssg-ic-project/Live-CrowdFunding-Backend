@@ -52,12 +52,16 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+//                        websocket endpoint 허용
+                        .requestMatchers("/ws/**", "/sub/**", "/pub/**").permitAll()
                         .requestMatchers("/**").permitAll())
 //                        .requestMatchers("/api/account/login", "/api/account/refresh").permitAll()
 //                        .requestMatchers("/oauth2/**", "/login/**").permitAll()
 //                        .requestMatchers("/api/oauth2/**").permitAll()
 //                        .requestMatchers("/login/oauth2/code/**").permitAll()
 //                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+//                        .requestMatchers("/api/dashboard/**").permitAll()
+//                        .requestMatchers("/api/admin-account/**").permitAll()
 //                        .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
@@ -77,9 +81,9 @@ public class SecurityConfig {
                                                 HttpServletResponse response,
                                                 AuthenticationException exception) throws IOException {
                 log.error("OAuth2 authentication failed: ", exception);
-                String targetUrl = "http://localhost:5173/login?error=" +
-                        URLEncoder.encode(exception.getMessage(), StandardCharsets.UTF_8);
-                getRedirectStrategy().sendRedirect(request, response, targetUrl);
+//                String targetUrl = "http://localhost:5173/login?error=" +
+//                        URLEncoder.encode(exception.getMessage(), StandardCharsets.UTF_8);
+//                getRedirectStrategy().sendRedirect(request, response, targetUrl);
             }
         };
     }
@@ -87,14 +91,23 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://127.0.0.1:5500"));
+//        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
         configuration.setExposedHeaders(Arrays.asList("Authorization", "RefreshToken"));
 
+        // WebSocket을 위한 CORS 설정 추가
+        configuration.addAllowedOriginPattern("*");  // WebSocket의 경우 더 유연한 CORS 정책이 필요할 수 있음
+        configuration.addAllowedHeader("Sec-WebSocket-Protocol");
+        configuration.addAllowedHeader("Sec-WebSocket-Version");
+        configuration.addAllowedHeader("Sec-WebSocket-Key");
+        configuration.addAllowedHeader("Sec-WebSocket-Extensions");
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/ws/**", configuration);
         return source;
     }
 

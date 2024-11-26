@@ -19,7 +19,7 @@ public class UserServiceTest {
 
     @Test
     public void findUserTest() {
-        Long userId = 1L;
+        Long userId = 7L;
 
         UserInfoResponseDTO userInfoResponseDTO = userService.findUser(userId);
 

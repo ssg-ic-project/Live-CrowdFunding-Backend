@@ -14,5 +14,6 @@ public class AccountTokenResponseDTO {  // 토큰 재발급 응답
     private String accessToken;
     private String refreshToken;
     private String userEmail;
+    private String identificationNumber;
     private Role role;
 }

@@ -105,6 +105,17 @@ public class JwtUtil {
             throw new IllegalArgumentException("Invalid token");
         }
     }
+    //사번 ID 추출
+    public String getEmployeeNumberFromToken(String token) {
+        try {
+            return parseToken(token).getBody().getSubject();
+        } catch (Exception e) {
+            log.error("Failed to get employee number from token: {}", e.getMessage());
+            throw new IllegalArgumentException("Invalid token");
+        }
+    }
+
+
 
     /**
      * 토큰에서 역할 추출
