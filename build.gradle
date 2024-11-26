@@ -47,6 +47,14 @@ dependencies {
     // https://mvnrepository.com/artifact/org.ahocorasick/ahocorasick
     implementation 'org.ahocorasick:ahocorasick:0.6.3'
 
+//    https://stackoverflow.com/questions/29024520/classnotfoundexception-com-amazonaws-auth-awscredentials-java
+
+    // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.778'
+
+    // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core
+    implementation 'com.amazonaws:aws-java-sdk-core:1.12.778'
+
     //oauth2
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
