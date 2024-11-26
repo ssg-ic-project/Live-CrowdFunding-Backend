@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/project")
 @RequiredArgsConstructor
@@ -50,5 +52,26 @@ public class ProjectController {
     @GetMapping("/list")
     public ResponseEntity<PageListResponseDTO<ProjectListResponseDTO>> getProjectList(@RequestBody ProjectListRequestDTO requestDTO, @ModelAttribute PageRequestDTO pageRequestDTO) {
         return ResponseEntity.ok(projectService.getProjectList(requestDTO, pageRequestDTO));
+    }
+
+    // 메인 페이지
+    @GetMapping("/main")
+    public ResponseEntity<ProjectMainResponseDTO> getMainProjectList() {
+        return ResponseEntity.ok(projectService.getMainProjects());
+    }
+
+    @GetMapping("/live-vod")
+    public ResponseEntity<List<ProjectLiveVODResponseDTO>> getLiveAndVODProjectList() {
+        return ResponseEntity.ok(projectService.getLiveAndVODProjectList());
+    }
+
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<PageListResponseDTO<ProjectWithConditionResponseDTO>> getCategoryProjects(@PathVariable Long categoryId, @ModelAttribute PageRequestDTO pageRequestDTO) {
+        return ResponseEntity.ok(projectService.getCategoryProjects(categoryId, pageRequestDTO));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<PageListResponseDTO<ProjectWithConditionResponseDTO>> getSearchProjects(@RequestParam String keyword, @ModelAttribute PageRequestDTO pageRequestDTO) {
+        return ResponseEntity.ok(projectService.getSearchProjects(keyword, pageRequestDTO));
     }
 }

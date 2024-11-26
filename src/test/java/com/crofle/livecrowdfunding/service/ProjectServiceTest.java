@@ -33,12 +33,12 @@ public class ProjectServiceTest {
                  .makerId(1L)
                  .planId(1L)
                  .categoryId(2L)
-                 .productName("상태 테스팅 상품")
-                 .summary("이건 좀 비쌀듯")
-                 .price(1000000)
-                 .discountPercentage(10)
-                 .goalAmount(1000000000)
-                 .contentImage("contentImage.jpg")
+                 .productName("상태 테스팅 상품22")
+                 .summary("이건 좀 비쌀듯??")
+                 .price(100000)
+                 .discountPercentage(20)
+                 .goalAmount(10000000)
+                 .contentImage("contentImageme.jpg")
                  .images(List.of(
                          ImageRegisterRequestDTO.builder()
                                  .url("image1.jpg")
@@ -54,12 +54,12 @@ public class ProjectServiceTest {
                  .essentialDocuments(List.of(
                          DocumentRegisterRequestDTO.builder()
                                  .url("document1.pdf")
-                                 .docType(DocumentType.개발)
+                                 .docType(DocumentType.상품정보)
                                  .name("필수문서1")
                                  .build(),
                          DocumentRegisterRequestDTO.builder()
                                  .url("document2.pdf")
-                                 .docType(DocumentType.프로젝트)
+                                 .docType(DocumentType.펀딩정보)
                                  .name("필수문서2")
                                  .build()
                  ))
@@ -120,12 +120,12 @@ public class ProjectServiceTest {
                 .essentialDocuments(List.of(
                         DocumentRegisterRequestDTO.builder()
                                 .url("변경된document1.pdf")
-                                .docType(DocumentType.개발)
+                                .docType(DocumentType.상품정보)
                                 .name("필수문서1")
                                 .build(),
                         DocumentRegisterRequestDTO.builder()
                                 .url("변경된document2.pdf")
-                                .docType(DocumentType.프로젝트)
+                                .docType(DocumentType.펀딩정보)
                                 .name("필수문서2")
                                 .build()
                 ))
@@ -142,5 +142,31 @@ public class ProjectServiceTest {
 
         List<ProjectListResponseDTO> projectList = projectService.getProjectList(requestDTO, PageRequestDTO.builder().page(1).size(2).build()).getDataList();
         log.info(projectList);
+    }
+
+    @Test
+    public void testFindMainProjects() {
+        ProjectMainResponseDTO projectMainResponseDTO = projectService.getMainProjects();
+        log.info(projectMainResponseDTO);
+    }
+
+    @Test
+    public void testFindLiveAndVODProjectList() {
+        List<ProjectLiveVODResponseDTO> projectLiveVODResponseDTOList = projectService.getLiveAndVODProjectList();
+        log.info(projectLiveVODResponseDTOList);
+    }
+
+    @Test
+    public void testFindCategoryProjects() {
+        Long categoryId = 1L;
+        PageListResponseDTO<ProjectWithConditionResponseDTO> dto = projectService.getCategoryProjects(categoryId, PageRequestDTO.builder().page(1).size(2).build());
+        log.info(dto);
+    }
+
+    @Test
+    public void testFindSearchProjects() {
+        String keyword = "싸디";
+        PageListResponseDTO<ProjectWithConditionResponseDTO> dto = projectService.getSearchProjects(keyword, PageRequestDTO.builder().page(1).size(2).build());
+        log.info(dto);
     }
 }

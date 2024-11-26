@@ -1,6 +1,7 @@
 package com.crofle.livecrowdfunding.controller;
 
 import com.crofle.livecrowdfunding.dto.request.ScheduleRegisterRequestDTO;
+import com.crofle.livecrowdfunding.dto.response.ScheduleChartResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.ScheduleReserveResponseDTO;
 import com.crofle.livecrowdfunding.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
@@ -25,5 +26,10 @@ public class ScheduleController {
     @GetMapping
     public ResponseEntity<List<ScheduleReserveResponseDTO>> getReserveSchedule() {
         return ResponseEntity.ok().body(scheduleService.getReserveSchedule(LocalDateTime.now()));
+    }
+
+    @GetMapping("/chart")
+    public ResponseEntity<List<ScheduleChartResponseDTO>> getScheduleChart() {
+        return ResponseEntity.ok().body(scheduleService.getScheduleChart(LocalDateTime.now()));
     }
 }

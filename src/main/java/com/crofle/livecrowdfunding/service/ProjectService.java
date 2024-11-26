@@ -1,7 +1,6 @@
 package com.crofle.livecrowdfunding.service;
 
-
-import com.crofle.livecrowdfunding.domain.entity.Project;
+import com.crofle.livecrowdfunding.dto.response.ProjectWithConditionResponseDTO;
 import com.crofle.livecrowdfunding.dto.request.*;
 import com.crofle.livecrowdfunding.dto.response.*;
 
@@ -22,4 +21,12 @@ public interface ProjectService {
     void updateProject(Long id, ProjectUpdateRequestDTO requestDTO);
 
     PageListResponseDTO<ProjectListResponseDTO> getProjectList(ProjectListRequestDTO requestDTO, PageRequestDTO pageRequestDTO);
+
+    ProjectMainResponseDTO getMainProjects();
+
+    List<ProjectLiveVODResponseDTO> getLiveAndVODProjectList();
+
+    PageListResponseDTO<ProjectWithConditionResponseDTO> getCategoryProjects(Long categoryId, PageRequestDTO pageRequestDTO);
+
+    PageListResponseDTO<ProjectWithConditionResponseDTO> getSearchProjects(String keyword, PageRequestDTO pageRequestDTO);
 }

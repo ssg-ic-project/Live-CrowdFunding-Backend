@@ -18,6 +18,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -235,6 +237,48 @@ public class ProjectServiceImpl implements ProjectService {
                 return null;
         }
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ProjectMainResponseDTO getMainProjects() {
+        List<LiveFundingInMainResponseDTO> liveFundingProjects = projectRepository.findLiveFundingInMain();
+        List<TopFundingInMainResponseDTO> topFundingProjects = projectRepository.findTopFundingInMain(LocalDate.now().atStartOfDay());
+
+        return ProjectMainResponseDTO.builder()
+                .liveFundingProjects(liveFundingProjects)
+                .topFundingProjects(topFundingProjects)
+                .build();
+    }
+
+    @Override
+    public List<ProjectLiveVODResponseDTO> getLiveAndVODProjectList() {
+        return projectRepository.findLiveAndVODProjectList();
+    }
+
+    @Override
+    public PageListResponseDTO<ProjectWithConditionResponseDTO> getCategoryProjects(Long categoryId, PageRequestDTO pageRequestDTO) {
+        Page<ProjectWithConditionResponseDTO> projectPage = projectRepository.findByCategoryIdProject(categoryId, pageRequestDTO.getPageable());
+        return PageListResponseDTO.<ProjectWithConditionResponseDTO>builder()
+                .dataList(projectPage.getContent())
+                .pageInfoDTO(PageInfoDTO.withAll()
+                        .pageRequestDTO(pageRequestDTO)
+                        .total((int) projectPage.getTotalElements())
+                        .build())
+                .build();
+    }
+
+    @Override
+    public PageListResponseDTO<ProjectWithConditionResponseDTO> getSearchProjects(String keyword, PageRequestDTO pageRequestDTO) {
+        Page<ProjectWithConditionResponseDTO> projectPage = projectRepository.findByKeywordProject(keyword, pageRequestDTO.getPageable());
+        return PageListResponseDTO.<ProjectWithConditionResponseDTO>builder()
+                .dataList(projectPage.getContent())
+                .pageInfoDTO(PageInfoDTO.withAll()
+                        .pageRequestDTO(pageRequestDTO)
+                        .total((int) projectPage.getTotalElements())
+                        .build())
+                .build();
+    }
+
 
     private PageListResponseDTO<ProjectListResponseDTO> getProjectListResponseDTOPageListResponseDTO(PageRequestDTO pageRequestDTO, Page<Project> projects) {
         return PageListResponseDTO.<ProjectListResponseDTO>builder()

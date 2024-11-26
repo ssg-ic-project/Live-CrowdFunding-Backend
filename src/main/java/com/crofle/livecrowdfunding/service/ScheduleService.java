@@ -3,6 +3,7 @@ package com.crofle.livecrowdfunding.service;
 import com.crofle.livecrowdfunding.domain.entity.Script;
 import com.crofle.livecrowdfunding.domain.entity.Video;
 import com.crofle.livecrowdfunding.dto.request.ScheduleRegisterRequestDTO;
+import com.crofle.livecrowdfunding.dto.response.ScheduleChartResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.ScheduleReserveResponseDTO;
 
 import java.time.LocalDateTime;
@@ -12,4 +13,6 @@ public interface ScheduleService {
     void createSchedule(ScheduleRegisterRequestDTO requestDTO);
 
     List<ScheduleReserveResponseDTO> getReserveSchedule(LocalDateTime startDateTime);
+
+    List<ScheduleChartResponseDTO> getScheduleChart(LocalDateTime startDateTime);
 }
