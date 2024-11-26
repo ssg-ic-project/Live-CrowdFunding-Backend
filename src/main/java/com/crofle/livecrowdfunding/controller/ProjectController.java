@@ -4,6 +4,7 @@ import com.crofle.livecrowdfunding.dto.request.*;
 import com.crofle.livecrowdfunding.dto.response.*;
 import com.crofle.livecrowdfunding.service.ProjectService;
 import lombok.RequiredArgsConstructor;
+import net.minidev.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,4 +54,16 @@ public class ProjectController {
     public ResponseEntity<PageListResponseDTO<ProjectListResponseDTO>> getProjectList(@RequestBody ProjectListRequestDTO requestDTO, @ModelAttribute PageRequestDTO pageRequestDTO) {
         return ResponseEntity.ok(projectService.getProjectList(requestDTO, pageRequestDTO));
     }
+
+    //프로젝트 등록하기
+    @PostMapping(value="/projectRegist")
+    public ResponseEntity<JSONObject> projectRegist(@RequestBody String jsonBody) throws Exception {
+
+
+        return null;
+
+    };
+
 }
+
+

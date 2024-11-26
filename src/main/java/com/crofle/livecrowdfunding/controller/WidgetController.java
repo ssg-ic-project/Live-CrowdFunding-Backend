@@ -34,26 +34,27 @@ import java.util.Base64;
 public class WidgetController {
     private final PaymentService paymentService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final JSONParser jsonParser = new JSONParser();
+    private final String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"; //public 테스트용 토스 제공
+    private final Base64.Encoder encoder = Base64.getEncoder();
+
 
     @RequestMapping(value = "/confirm")
     public ResponseEntity<JSONObject> confirmPayment(@RequestBody String jsonBody) throws Exception {
 
-        JSONParser parser = new JSONParser();
         String orderId; //주문 테이블에서 가지고 온 값임.
         String amount;
         String paymentKey;
-        String method;
         String deliveryAddress;
         String paymentAt;
 
         try {
             // 클라이언트에서 받은 JSON 요청 바디입니다.
-            JSONObject requestData = (JSONObject) parser.parse(jsonBody);
+            JSONObject requestData = (JSONObject) jsonParser.parse(jsonBody);
             paymentKey = (String) requestData.get("paymentKey");
             orderId = (String) requestData.get("orderId");
             amount = (String) requestData.get("amount");
             paymentAt = (String) requestData.get("approvedAt");
-            method = (String) requestData.get("method");
             deliveryAddress = (String) requestData.get("deliveryAddress");
 
 //            log.info("checking from backend yejina");
@@ -65,7 +66,8 @@ public class WidgetController {
 
         } catch (ParseException e) {
             throw new RuntimeException(e);
-        };
+        }
+
         JSONObject obj = new JSONObject();
         obj.put("orderId", orderId);
         obj.put("amount", amount);
@@ -74,7 +76,7 @@ public class WidgetController {
 
         // TODO: 개발자센터에 로그인해서 내 결제위젯 연동 키 > 시크릿 키를 입력하세요. 시크릿 키는 외부에 공개되면 안돼요.
         // @docs https://docs.tosspayments.com/reference/using-api/api-keys
-        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"; //test용 public 키
+//        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"; //test용 public 키
 
         // 토스페이먼츠 API는 시크릿 키를 사용자 ID로 사용하고, 비밀번호는 사용하지 않습니다.
         // 비밀번호가 없다는 것을 알리기 위해 시크릿 키 뒤에 콜론을 추가합니다.
@@ -93,19 +95,17 @@ public class WidgetController {
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
 
-
         OutputStream outputStream = connection.getOutputStream();
         outputStream.write(obj.toString().getBytes("UTF-8"));
 
         int code = connection.getResponseCode();
         boolean isSuccess = code == 200;
 
-
         InputStream responseStream = isSuccess ? connection.getInputStream() : connection.getErrorStream();
 
         // TODO: 결제 성공 및 실패 비즈니스 로직을 구현하세요.
         Reader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
-        JSONObject jsonObject = (JSONObject) parser.parse(reader);
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
 
         log.info("checking yejina from backend: ");
         log.info(jsonObject);
@@ -116,15 +116,63 @@ public class WidgetController {
         responseStream.close();
 
         return ResponseEntity.status(code).body(jsonObject);
-    }
 
-    /**
-     * 인증성공처리
-     * @param request
-     * @param model
-     * @return
-     * @throws Exception
-     */
+    };
+
+    @RequestMapping(value="/basicFee")
+    public ResponseEntity<JSONObject> basicFee(@RequestBody String jsonBody) throws Exception {
+
+        String orderId; //주문 테이블에서 가지고 온 값
+        String amount;
+        String paymentKey;
+        log.info(jsonBody);
+
+        try {
+            // 클라이언트에서 받은 JSON 요청 바디입니다.
+            JSONObject requestData = (JSONObject) jsonParser.parse(jsonBody);
+            paymentKey = (String) requestData.get("paymentKey");
+            orderId = (String) requestData.get("orderId");
+            amount = (String) requestData.get("amount");
+
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        };
+        JSONObject obj = new JSONObject();
+        obj.put("orderId", orderId);
+        obj.put("amount", amount);
+        obj.put("paymentKey", paymentKey);
+
+        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+        String authorizations = "Basic " + new String(encodedBytes);
+
+        // 결제 승인 API를 호출하기
+        URL url = new URL("https://api.tosspayments.com/v1/payments/confirm");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestProperty("Authorization", authorizations);
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+
+        OutputStream outputStream = connection.getOutputStream();
+        outputStream.write(obj.toString().getBytes("UTF-8"));
+
+        int code = connection.getResponseCode();
+        boolean isSuccess = code == 200;
+
+        InputStream responseStream = isSuccess ? connection.getInputStream() : connection.getErrorStream();
+
+        // TODO: 결제 성공 및 실패 비즈니스 로직을 구현하세요.
+        Reader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
+
+        responseStream.close();
+        log.info("checking for 7만원 결제");
+
+        return ResponseEntity.status(code).body(jsonObject);
+    };
+
+
+
     @RequestMapping(value = "/success", method = RequestMethod.GET)
     public String paymentRequest(HttpServletRequest request, Model model) throws Exception {
         return "/success";
