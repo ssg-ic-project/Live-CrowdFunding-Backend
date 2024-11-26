@@ -19,6 +19,8 @@ public interface MakerRepository extends JpaRepository<Maker, Long> {
     Page<Maker> findByConditions(@Param("dto") PageRequestDTO dto, Pageable pageable);
 
     @Modifying
+    @Transactional
     @Query("UPDATE Maker m SET m.password = :password WHERE m.id = :id")
     void updatePassword(@Param("id") Long id, @Param("password") String password);
+
 }

@@ -94,7 +94,12 @@ public class JwtUtil {
      */
     public String getEmailFromToken(String token) {
         try {
-            return parseToken(token).getBody().getSubject();
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
         } catch (Exception e) {
             log.error("Failed to get email from token: {}", e.getMessage());
             throw new IllegalArgumentException("Invalid token");
