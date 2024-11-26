@@ -1,5 +1,6 @@
 package com.crofle.livecrowdfunding.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.NamedStoredProcedureQueries;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,5 +18,6 @@ public class ProjectLiveVODResponseDTO {
     private Integer percentage;
     private String classification;
     private Long remainingTime;
+    @JsonProperty("isStreaming")
     private boolean isStreaming;
 }
