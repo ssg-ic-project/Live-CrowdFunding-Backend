@@ -27,7 +27,7 @@ public class ProjectController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("{id}/status/")
+    @PatchMapping("{id}/status")
     public ResponseEntity<Void> updateProjectStatus(@PathVariable Long id, @RequestBody ProjectStatusRequestDTO requestDTO) {
         projectService.updateProjectStatus(id, requestDTO);
         return ResponseEntity.ok().build();
