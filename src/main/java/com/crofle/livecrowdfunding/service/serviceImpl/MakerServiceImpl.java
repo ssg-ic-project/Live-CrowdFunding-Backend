@@ -100,7 +100,7 @@
                 Maker maker = Maker.builder()
                         .name(request.getName())
                         .phone(request.getPhone())
-                        .business(Long.parseLong(businessResult.getBusinessNumber().replace("-", "")))
+                        .business(Integer.parseInt(businessResult.getBusinessNumber().replace("-", "")))
                         .email(request.getEmail())
                         .password(encodedPassword)
                         .zipcode(request.getZipcode())

@@ -29,7 +29,7 @@ public class Maker {
     private String phone;
 
     @Column(nullable = false)
-    private Long business;
+    private Integer business;
 
     @Column(length = 255, nullable = false)
     private String email;
