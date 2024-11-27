@@ -78,7 +78,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<ProjectListResponseDTO> findByProgressStatuses(@Param("id") Long id, @Param("statuses") List<ProjectStatus> statuses, Pageable pageable);
 
     // 메인 화면에서 라이브중인 프로젝트 조회
-    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO(p.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long)) FROM Project p " +
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO(p.id, s.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long)) FROM Project p " +
             "JOIN p.schedules s LEFT JOIN p.images i " +
             "WHERE s.isStreaming = true AND i.imageNumber = 1 " +
             "ORDER BY s.totalViewer DESC")
@@ -90,13 +90,13 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "ORDER BY t.ranking ASC")
     List<TopFundingInMainResponseDTO> findTopFundingInMain(@Param("today") LocalDateTime today);
 
-    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectLiveVODResponseDTO(p.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long), s.isStreaming) FROM Project p " +
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectLiveVODResponseDTO(p.id, s.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long), s.isStreaming) FROM Project p " +
             "JOIN p.schedules s LEFT JOIN p.images i LEFT JOIN p.maker m LEFT JOIN s.video v " +
             "WHERE i.imageNumber = 1 and p.progressProjectStatus = '펀딩중' AND (s.isStreaming = true OR v.mediaUrl IS NOT NULL )" +
             "ORDER BY s.date DESC")
     List<ProjectLiveVODResponseDTO> findLiveAndVODProjectList();
 
-    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectWithConditionResponseDTO(p.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long), s.isStreaming) FROM Project p " +
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectWithConditionResponseDTO(p.id, s.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long), s.isStreaming) FROM Project p " +
             "LEFT JOIN p.images i WITH i.imageNumber = 1 " +
             "LEFT JOIN p.schedules s " +
             "WHERE p.progressProjectStatus = '펀딩중' " +
@@ -104,7 +104,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "ORDER BY p.id DESC")
     Page<ProjectWithConditionResponseDTO> findByKeywordProject(@Param("keyword") String keyword, Pageable pageable);
 
-    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectWithConditionResponseDTO(p.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long), s.isStreaming) FROM Project p " +
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectWithConditionResponseDTO(p.id, s.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long), s.isStreaming) FROM Project p " +
             "LEFT JOIN p.images i WITH i.imageNumber = 1 " +
             "LEFT JOIN p.schedules s " +
             "WHERE p.progressProjectStatus = '펀딩중' " +

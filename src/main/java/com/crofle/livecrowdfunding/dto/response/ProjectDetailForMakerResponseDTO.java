@@ -14,15 +14,18 @@ import java.util.List;
 @NoArgsConstructor
 public class ProjectDetailForMakerResponseDTO { // 판매자 프로젝트 조회, 프로젝트 정보와 미니 대시보드 리턴
     private String productName;
-    private Integer price;
-    private String category;    //서비스에서 검토 로직있어야함
     private String showStatus;
+    private String category;    //서비스에서 검토 로직있어야함
+    private Integer price;
     private Integer discountPercentage;
+    private Integer goalAmount;
     private LocalDateTime startAt;
     private LocalDateTime endAt;
+    private Integer paymentCount;
+    private Integer currentSales;
     private Integer percentage;
-    private Integer goalAmount;
     private List<ImageResponseDTO> images;
     private List<DocumentResponseDTO> essentialDocuments;
-    private Integer paymentCount;
+    private String summary;
+    private String contentImage;
 }

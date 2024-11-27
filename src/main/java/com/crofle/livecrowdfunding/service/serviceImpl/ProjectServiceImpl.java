@@ -119,6 +119,10 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectDetailForMakerResponseDTO projectDetailForMakerResponseDTO = modelMapper.map(project, ProjectDetailForMakerResponseDTO.class);
         projectDetailForMakerResponseDTO.setCategory(project.getCategory().getClassification());
         projectDetailForMakerResponseDTO.setShowStatus(checkShowStatus(project));
+        projectDetailForMakerResponseDTO.setCurrentSales((int) project.getOrders().stream()
+                .filter(order -> order.getPaymentHistory() != null)
+                .mapToInt(order -> order.getPaymentPrice())
+                .sum());
         projectDetailForMakerResponseDTO.setPaymentCount((int) project.getOrders().stream()
                 .filter(order -> order.getPaymentHistory() != null)
                 .count());
