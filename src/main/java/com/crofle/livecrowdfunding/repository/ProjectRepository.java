@@ -34,7 +34,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     // 펀딩 진행 전
     @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectListResponseDTO(" +
-            "p.id, p.productName, p.startAt, p.progressProjectStatus, " +
+            "p.id, p.productName, p.startAt, p.reviewProjectStatus, " +
             "CAST(COALESCE(SUM(o.paymentPrice), 0) AS long), p.percentage) " +
             "FROM Project p " +
             "LEFT JOIN p.orders o " +

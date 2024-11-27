@@ -49,9 +49,9 @@ public class ProjectController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<PageListResponseDTO<ProjectListResponseDTO>> getProjectListByStatus(@PathVariable Long id, @RequestBody ProjectListRequestDTO requestDTO, @ModelAttribute PageRequestDTO pageRequestDTO) {
-        return ResponseEntity.ok(projectService.getProjectList(id, requestDTO, pageRequestDTO));
+    @GetMapping("/list/{id}")
+    public ResponseEntity<PageListResponseDTO<ProjectListResponseDTO>> getProjectListByStatus(@PathVariable Long id, @RequestParam int statusNumber, @ModelAttribute PageRequestDTO pageRequestDTO) {
+        return ResponseEntity.ok(projectService.getProjectList(id, statusNumber, pageRequestDTO));
     }
 
     // 메인 페이지

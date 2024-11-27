@@ -203,11 +203,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Transactional(readOnly = true)
     @Override   // 좋지못한 로직이지만 erd 를 바꿔야해서 리팩토링으로 남겨둬야 함 1. 검토중, 반려 2. 승인& 펀딩중 3. 성공, 미달성
-    public PageListResponseDTO<ProjectListResponseDTO> getProjectList(Long makerId, ProjectListRequestDTO requestDTO, PageRequestDTO pageRequestDTO) {;
+    public PageListResponseDTO<ProjectListResponseDTO> getProjectList(Long makerId, int statusNumber, PageRequestDTO pageRequestDTO) {;
 
         Page<ProjectListResponseDTO> projectListResponseDTOS;
 
-        switch (requestDTO.getStatusNumber()) {
+        switch (statusNumber) {
             case 1:
                 projectListResponseDTOS = projectRepository.findByReviewStatuses(makerId, List.of(ProjectStatus.검토중, ProjectStatus.반려), pageRequestDTO.getPageable());
                 return PageListResponseDTO.<ProjectListResponseDTO>builder()
