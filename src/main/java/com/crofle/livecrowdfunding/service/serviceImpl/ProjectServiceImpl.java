@@ -35,7 +35,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
-    public ProjectDetailResponseDTO getProjectForUser(Long id) {
+    public ProjectDetailResponseDTO getProjectForUser(Long id, Long userId) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("프로젝트 조회에 실패했습니다"));
 
@@ -44,6 +44,8 @@ public class ProjectServiceImpl implements ProjectService {
         projectDetailResponseDTO.setCategory(project.getCategory().getClassification());
         //우선 같이 가져오지만 비동기 처리 고려
         projectDetailResponseDTO.setLikeCount(project.getLikes().size());
+        projectDetailResponseDTO.setIsLiked(project.getLikes().stream()
+                .anyMatch(like -> like.getUser().getId().equals(userId)));
 
         return projectDetailResponseDTO;
     }

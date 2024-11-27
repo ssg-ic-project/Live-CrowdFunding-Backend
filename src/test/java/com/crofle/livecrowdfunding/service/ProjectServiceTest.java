@@ -23,7 +23,8 @@ public class ProjectServiceTest {
     @Test
     public void testFindProjectDetail() {
         Long id = 1L;
-        ProjectDetailResponseDTO projectDetailResponseDTO = projectService.getProjectForUser(id);
+        Long userId = 1L;
+        ProjectDetailResponseDTO projectDetailResponseDTO = projectService.getProjectForUser(id, userId);
         log.info(projectDetailResponseDTO);
     }
 

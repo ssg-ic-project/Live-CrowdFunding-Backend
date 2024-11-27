@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ProjectService {
   
-    ProjectDetailResponseDTO getProjectForUser(Long id);
+    ProjectDetailResponseDTO getProjectForUser(Long id, Long userId);
 
     void createProject(ProjectRegisterRequestDTO requestDTO);
 

@@ -16,9 +16,9 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectDetailResponseDTO> getProject(@PathVariable Long id) {
+    public ResponseEntity<ProjectDetailResponseDTO> getProject(@PathVariable Long id, @RequestParam(required = false) Long userId) {
 
-        return ResponseEntity.ok(projectService.getProjectForUser(id));
+        return ResponseEntity.ok(projectService.getProjectForUser(id, userId));
     }
 
     @PostMapping

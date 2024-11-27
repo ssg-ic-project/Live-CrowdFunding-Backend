@@ -24,4 +24,5 @@ public class ProjectDetailResponseDTO { // 사용자가 프로젝트 조회 시 
     private String contentImage;
     private List<ImageResponseDTO> images;
     private Integer likeCount;
+    private Boolean isLiked;
 }
