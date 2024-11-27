@@ -63,16 +63,6 @@ public class LikedServiceImpl implements LikedService {
                         .total((int)likedProjects.getTotalElements())
                         .build())
                 .build();
-//        return likedProjects.stream()
-//                .map(project -> ProjectLikedResponseDTO.builder()
-//                        .id(project.getId())
-//                        .productName(project.getProductName())
-//                        .description(project.getSummary())
-//                        .thumbnailUrl(project.getImages().get(0).getUrl())
-//                        .price(project.getPrice())
-//                        .percentage(project.getDiscountPercentage())
-//                        .build())
-//                .collect(Collectors.toList());
     }
 
     private void validateRequest(LikedRequestDTO request) {
