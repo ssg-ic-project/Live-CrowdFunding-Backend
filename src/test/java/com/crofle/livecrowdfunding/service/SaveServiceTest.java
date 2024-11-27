@@ -54,7 +54,7 @@ public class SaveServiceTest {
         SaveMakerRequestDTO request = SaveMakerRequestDTO.builder()
                 .name("aasd")
                 .phone("010-7777-6666")
-                .business(12345L)
+                .business(12345)
                 .email("bbbb@bbb.com")
                 .password(passwordEncoder.encode("1234"))
                 .zipcode(12345)
