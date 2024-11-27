@@ -46,7 +46,7 @@ out/
 *.tar.gz
 *.rar
 
-application.properties
+*.properties
 
 .gradle/
 build/

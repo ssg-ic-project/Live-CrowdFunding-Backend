@@ -15,6 +15,7 @@ import com.crofle.livecrowdfunding.domain.enums.UserStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ public class UserServiceImpl implements UserService {
     private final CategoryRepository categoryRepository;
     private final MakerRepository makerRepository;
     private final AccountViewRepository accountViewRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(readOnly = true)
@@ -65,6 +67,9 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Email already exists");
         }
 
+        // 비밀번호 암호화 추가
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
         User user = User.builder()
                 .name(request.getName())
                 .nickname(request.getNickname())
@@ -72,7 +77,7 @@ public class UserServiceImpl implements UserService {
                 .gender(request.getGender())
                 .birth(request.getBirth())
                 .email(request.getEmail())
-                .password(request.getPassword())
+                .password(encodedPassword)
                 .zipcode(request.getZipcode())
                 .address(request.getAddress())
                 .detailAddress(request.getDetailAddress())

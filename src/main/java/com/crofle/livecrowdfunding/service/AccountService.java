@@ -4,6 +4,10 @@ import com.crofle.livecrowdfunding.domain.entity.AccountView;
 import com.crofle.livecrowdfunding.dto.request.*;
 import com.crofle.livecrowdfunding.dto.response.AccountTokenResponseDTO;
 import com.crofle.livecrowdfunding.dto.request.AccountOAuthRequestDTO;
+import com.crofle.livecrowdfunding.dto.response.BusinessVerificationResponseDTO;
+import com.crofle.livecrowdfunding.dto.response.EmploymentCertOcrResponseDTO;
+import com.crofle.livecrowdfunding.dto.response.IdCardOcrResponseDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 import java.util.Optional;
@@ -45,4 +49,20 @@ public interface AccountService {
     String getStoredRefreshToken(String email);
 
     void deleteTokens(String email);
+
+    // 인증 코드 생성 및 발송 메서드 추가
+    String sendVerificationEmail(String email);
+
+    // 인증 코드 생성 메서드
+    String generateVerificationCode();
+
+    // 인증 코드 확인 메서드
+    boolean verifyCode(String email, String code);
+
+    boolean isEmailDuplicate(String email);
+
+    IdCardOcrResponseDTO verifyIdCard(MultipartFile idCard);
+    EmploymentCertOcrResponseDTO verifyEmploymentCert(MultipartFile employmentCert);
+    BusinessVerificationResponseDTO verifyBusinessNumber(String businessNumber);
+
 }

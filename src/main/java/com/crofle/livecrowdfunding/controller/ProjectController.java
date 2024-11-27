@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -18,6 +17,7 @@ public class ProjectController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProjectDetailResponseDTO> getProject(@PathVariable Long id) {
+
         return ResponseEntity.ok(projectService.getProjectForUser(id));
     }
 
