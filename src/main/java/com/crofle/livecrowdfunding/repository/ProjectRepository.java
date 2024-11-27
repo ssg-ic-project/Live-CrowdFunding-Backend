@@ -32,20 +32,50 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "WHERE p.id = :id")
     Optional<Project> findByIdWithDocuments(@Param("id") Long id);
 
-    @Query("SELECT p FROM Project p WHERE p.reviewProjectStatus IN :statuses")
-    Page<Project> findByReviewStatuses(@Param("statuses") List<ProjectStatus> statuses, Pageable pageable);
+    // 펀딩 진행 전
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectListResponseDTO(" +
+            "p.id, p.productName, p.startAt, p.progressProjectStatus, " +
+            "CAST(COALESCE(SUM(o.paymentPrice), 0) AS long), p.percentage) " +
+            "FROM Project p " +
+            "LEFT JOIN p.orders o " +
+            "LEFT JOIN o.paymentHistory ph " +
+            "WHERE p.reviewProjectStatus IN :statuses " +
+            "AND p.maker.id = :id " +
+            "GROUP BY p.id, p.productName, p.startAt, p.progressProjectStatus, p.percentage " +
+            "ORDER BY p.id DESC")
+    Page<ProjectListResponseDTO> findByReviewStatuses(@Param("id") Long id, @Param("statuses") List<ProjectStatus> statuses, Pageable pageable);
 
     // 펀딩 진행 중인 프로젝트 조회 (승인 && 펀딩중)
-    @Query("SELECT p FROM Project p WHERE p.reviewProjectStatus = :reviewStatus AND p.progressProjectStatus = :progressStatus")
-    Page<Project> findByReviewStatusAndProgressStatus(
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectListResponseDTO(" +
+            "p.id, p.productName, p.startAt, p.progressProjectStatus, " +
+            "CAST(COALESCE(SUM(o.paymentPrice), 0) AS long), p.percentage) " +
+            "FROM Project p " +
+            "LEFT JOIN p.orders o " +
+            "LEFT JOIN o.paymentHistory ph " +
+            "WHERE p.reviewProjectStatus = :reviewStatus " +
+            "AND p.progressProjectStatus = :progressStatus " +
+            "AND p.maker.id = :id " +
+            "GROUP BY p.id, p.productName, p.startAt, p.progressProjectStatus, p.percentage " +
+            "ORDER BY p.id DESC")
+    Page<ProjectListResponseDTO> findByReviewStatusAndProgressStatus(
+            @Param("id") Long id,
             @Param("reviewStatus") ProjectStatus reviewStatus,
             @Param("progressStatus") ProjectStatus progressStatus,
             Pageable pageable
     );
 
     // 펀딩 종료된 프로젝트 조회 (성공, 미달성)
-    @Query("SELECT p FROM Project p WHERE p.progressProjectStatus IN :statuses")
-    Page<Project> findByProgressStatuses(@Param("statuses") List<ProjectStatus> statuses, Pageable pageable);
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectListResponseDTO(" +
+            "p.id, p.productName, p.startAt, p.progressProjectStatus, " +
+            "CAST(COALESCE(SUM(o.paymentPrice), 0) AS long), p.percentage) " +
+            "FROM Project p " +
+            "LEFT JOIN p.orders o " +
+            "LEFT JOIN o.paymentHistory ph " +
+            "WHERE p.progressProjectStatus IN :statuses " +
+            "AND p.maker.id = :id " +
+            "GROUP BY p.id, p.productName, p.startAt, p.progressProjectStatus, p.percentage " +
+            "ORDER BY p.id DESC")
+    Page<ProjectListResponseDTO> findByProgressStatuses(@Param("id") Long id, @Param("statuses") List<ProjectStatus> statuses, Pageable pageable);
 
     // 메인 화면에서 라이브중인 프로젝트 조회
     @Query("SELECT new com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO(p.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long)) FROM Project p " +

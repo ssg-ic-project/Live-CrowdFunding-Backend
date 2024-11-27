@@ -50,8 +50,8 @@ public class ProjectController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<PageListResponseDTO<ProjectListResponseDTO>> getProjectList(@RequestBody ProjectListRequestDTO requestDTO, @ModelAttribute PageRequestDTO pageRequestDTO) {
-        return ResponseEntity.ok(projectService.getProjectList(requestDTO, pageRequestDTO));
+    public ResponseEntity<PageListResponseDTO<ProjectListResponseDTO>> getProjectListByStatus(@PathVariable Long id, @RequestBody ProjectListRequestDTO requestDTO, @ModelAttribute PageRequestDTO pageRequestDTO) {
+        return ResponseEntity.ok(projectService.getProjectList(id, requestDTO, pageRequestDTO));
     }
 
     // 메인 페이지
