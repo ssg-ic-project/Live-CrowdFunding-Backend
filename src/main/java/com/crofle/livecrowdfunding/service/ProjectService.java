@@ -3,6 +3,7 @@ package com.crofle.livecrowdfunding.service;
 import com.crofle.livecrowdfunding.dto.response.ProjectWithConditionResponseDTO;
 import com.crofle.livecrowdfunding.dto.request.*;
 import com.crofle.livecrowdfunding.dto.response.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public interface ProjectService {
   
     ProjectDetailResponseDTO getProjectForUser(Long id, Long userId);
 
-    void createProject(ProjectRegisterRequestDTO requestDTO);
+    void createProject(ProjectRegisterRequestDTO requestDTO, List<MultipartFile> images, List<MultipartFile> documents);
 
     void updateProjectStatus(Long id, ProjectStatusRequestDTO requestDTO);
     

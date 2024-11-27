@@ -1,6 +1,16 @@
 package com.crofle.livecrowdfunding.service.serviceImpl;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.crofle.livecrowdfunding.domain.entity.*;
+import com.crofle.livecrowdfunding.domain.enums.DocumentType;
 import com.crofle.livecrowdfunding.domain.enums.ProjectStatus;
 import com.crofle.livecrowdfunding.dto.PageInfoDTO;
 import com.crofle.livecrowdfunding.dto.request.*;
@@ -14,13 +24,17 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +47,28 @@ public class ProjectServiceImpl implements ProjectService {
     private final RatePlanRepository ratePlanRepository;
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
+
+    @Value("${ncp.storage.endpoint}")
+    private String endPoint;
+
+    @Value("${ncp.storage.region}")
+    private String region;
+
+    @Value("${ncp.storage.access-key}")
+    private String accessKey;
+
+    @Value("${ncp.storage.secret-key}")
+    private String secretKey;
+
+    @Value("${ncp.storage.bucket}")
+    private String bucket;
+
+    private AmazonS3 getS3Client() {
+        return AmazonS3ClientBuilder.standard()
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endPoint, region))
+                .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
+                .build();
+    }
 
     @Transactional(readOnly = true)
     public ProjectDetailResponseDTO getProjectForUser(Long id, Long userId) {
@@ -52,7 +88,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Transactional
     @Override
-    public void createProject(ProjectRegisterRequestDTO requestDTO) {
+    public void createProject(ProjectRegisterRequestDTO requestDTO,
+                              List<MultipartFile> images,
+                              List<MultipartFile> documents) {
         Maker maker = makerRepository.findById(requestDTO.getMakerId())
                 .orElseThrow(() -> new EntityNotFoundException("메이커 조회에 실패했습니다"));
 
@@ -61,6 +99,8 @@ public class ProjectServiceImpl implements ProjectService {
 
         RatePlan ratePlan = ratePlanRepository.findById(requestDTO.getPlanId())
                 .orElseThrow(() -> new EntityNotFoundException("요금제 조회에 실패했습니다"));
+
+        String contentImageUrl = uploadToNcp(requestDTO.getContentImage(), "content-images/");
 
         Project project = Project.builder()
                 .maker(maker)
@@ -71,33 +111,54 @@ public class ProjectServiceImpl implements ProjectService {
                 .price(requestDTO.getPrice())
                 .discountPercentage(requestDTO.getDiscountPercentage())
                 .goalAmount(requestDTO.getGoalAmount())
-                .contentImage(requestDTO.getContentImage())
+                .contentImage(contentImageUrl)
                 .build();
 
-        if(requestDTO.getImages() != null) {
-            requestDTO.getImages().forEach(image -> {
+        if (images != null) {
+            for (int i = 0; i < images.size(); i++) {
+                String imageUrl = uploadToNcp(images.get(i), "images/");
                 project.getImages().add(Image.builder()
                         .project(project)
-                        .url(image.getUrl())
-                        .imageNumber(image.getImageNumber())
-                        .name(image.getName())
+                        .url(imageUrl)
+                        .imageNumber(i)
+                        .name(images.get(i).getOriginalFilename())
                         .build());
-            });
+            }
         }
 
-        if(requestDTO.getEssentialDocuments() != null) {
-            requestDTO.getEssentialDocuments().forEach(document -> {
+        if (documents != null) {
+            for (int i = 0; i < documents.size(); i++) {
+                String documentUrl = uploadToNcp(documents.get(i), "documents/");
                 project.getEssentialDocuments().add(EssentialDocument.builder()
                         .project(project)
-                        .name(document.getName())
-                        .url(document.getUrl())
-                        .docType(document.getDocType())
+                        .url(documentUrl)
+                        .name(documents.get(i).getOriginalFilename())
+                        .docType(DocumentType.valueOf(documents.get(i).getContentType()))
                         .build());
-            });
+            }
         }
 
-
         projectRepository.save(project);
+    }
+
+    private String uploadToNcp(MultipartFile file, String folderName) {
+        AmazonS3 s3 = getS3Client();
+        String fileName = folderName + UUID.randomUUID() + "_" + file.getOriginalFilename();
+
+        try {
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(file.getContentType());
+            metadata.setContentLength(file.getSize());
+
+            s3.putObject(new PutObjectRequest(bucket, fileName,
+                    file.getInputStream(), metadata)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+
+            return String.format("https://%s.kr.object.ncloudstorage.com/%s", bucket, fileName);
+
+        } catch (IOException | AmazonS3Exception e) {
+            throw new RuntimeException("Failed to upload file", e);
+        }
     }
 
     @Transactional

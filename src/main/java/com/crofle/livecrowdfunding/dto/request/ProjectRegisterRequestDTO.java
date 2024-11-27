@@ -2,6 +2,7 @@ package com.crofle.livecrowdfunding.dto.request;
 
 import com.crofle.livecrowdfunding.dto.response.EssentialDocumentDTO;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,7 +21,5 @@ public class ProjectRegisterRequestDTO {
     private Integer price;
     private Integer discountPercentage;
     private Integer goalAmount;
-    private String contentImage;
-    private List<ImageRegisterRequestDTO> images;
-    private List<DocumentRegisterRequestDTO> essentialDocuments;
+    private MultipartFile contentImage;
 }

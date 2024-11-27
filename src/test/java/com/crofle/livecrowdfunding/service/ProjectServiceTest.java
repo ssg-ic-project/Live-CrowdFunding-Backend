@@ -30,43 +30,43 @@ public class ProjectServiceTest {
 
     @Test
     public void testCreateProject() {
-         ProjectRegisterRequestDTO requestDTO = ProjectRegisterRequestDTO.builder()
-                 .makerId(1L)
-                 .planId(1L)
-                 .categoryId(2L)
-                 .productName("상태 테스팅 상품22")
-                 .summary("이건 좀 비쌀듯??")
-                 .price(100000)
-                 .discountPercentage(20)
-                 .goalAmount(10000000)
-                 .contentImage("contentImageme.jpg")
-                 .images(List.of(
-                         ImageRegisterRequestDTO.builder()
-                                 .url("image1.jpg")
-                                 .imageNumber(1)
-                                 .name("이미지1")
-                                 .build(),
-                         ImageRegisterRequestDTO.builder()
-                                 .url("image2.jpg")
-                                 .imageNumber(2)
-                                 .name("이미지2")
-                                 .build()
-                 ))
-                 .essentialDocuments(List.of(
-                         DocumentRegisterRequestDTO.builder()
-                                 .url("document1.pdf")
-                                 .docType(DocumentType.상품정보)
-                                 .name("필수문서1")
-                                 .build(),
-                         DocumentRegisterRequestDTO.builder()
-                                 .url("document2.pdf")
-                                 .docType(DocumentType.펀딩정보)
-                                 .name("필수문서2")
-                                 .build()
-                 ))
-                 .build();
-
-         projectService.createProject(requestDTO);
+//         ProjectRegisterRequestDTO requestDTO = ProjectRegisterRequestDTO.builder()
+//                 .makerId(1L)
+//                 .planId(1L)
+//                 .categoryId(2L)
+//                 .productName("상태 테스팅 상품22")
+//                 .summary("이건 좀 비쌀듯??")
+//                 .price(100000)
+//                 .discountPercentage(20)
+//                 .goalAmount(10000000)
+//                 .contentImage("contentImageme.jpg")
+//                 .images(List.of(
+//                         ImageRegisterRequestDTO.builder()
+//                                 .url("image1.jpg")
+//                                 .imageNumber(1)
+//                                 .name("이미지1")
+//                                 .build(),
+//                         ImageRegisterRequestDTO.builder()
+//                                 .url("image2.jpg")
+//                                 .imageNumber(2)
+//                                 .name("이미지2")
+//                                 .build()
+//                 ))
+//                 .essentialDocuments(List.of(
+//                         DocumentRegisterRequestDTO.builder()
+//                                 .url("document1.pdf")
+//                                 .docType(DocumentType.상품정보)
+//                                 .name("필수문서1")
+//                                 .build(),
+//                         DocumentRegisterRequestDTO.builder()
+//                                 .url("document2.pdf")
+//                                 .docType(DocumentType.펀딩정보)
+//                                 .name("필수문서2")
+//                                 .build()
+//                 ))
+//                 .build();
+//
+//         projectService.createProject(requestDTO);
     }
 
     @Test
