@@ -120,6 +120,10 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectDetailForMakerResponseDTO projectDetailForMakerResponseDTO = modelMapper.map(project, ProjectDetailForMakerResponseDTO.class);
         projectDetailForMakerResponseDTO.setCategory(project.getCategory().getClassification());
         projectDetailForMakerResponseDTO.setShowStatus(checkShowStatus(project));
+        projectDetailForMakerResponseDTO.setCurrentSales((int) project.getOrders().stream()
+                .filter(order -> order.getPaymentHistory() != null)
+                .mapToInt(order -> order.getPaymentPrice())
+                .sum());
         projectDetailForMakerResponseDTO.setPaymentCount((int) project.getOrders().stream()
                 .filter(order -> order.getPaymentHistory() != null)
                 .count());
@@ -204,34 +208,28 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Transactional(readOnly = true)
     @Override   // 좋지못한 로직이지만 erd 를 바꿔야해서 리팩토링으로 남겨둬야 함 1. 검토중, 반려 2. 승인& 펀딩중 3. 성공, 미달성
-    public PageListResponseDTO<ProjectListResponseDTO> getProjectList(ProjectListRequestDTO requestDTO, PageRequestDTO pageRequestDTO) {
-        int num = requestDTO.getStatusNumber();
-        Page<Project> projects;
+    public PageListResponseDTO<ProjectListResponseDTO> getProjectList(Long makerId, int statusNumber, PageRequestDTO pageRequestDTO) {;
 
-        switch (num) {
+        Page<ProjectListResponseDTO> projectListResponseDTOS;
+
+        switch (statusNumber) {
             case 1:
-                projects = projectRepository.findByReviewStatuses(List.of(ProjectStatus.검토중, ProjectStatus.반려), pageRequestDTO.getPageable());
+                projectListResponseDTOS = projectRepository.findByReviewStatuses(makerId, List.of(ProjectStatus.검토중, ProjectStatus.반려), pageRequestDTO.getPageable());
                 return PageListResponseDTO.<ProjectListResponseDTO>builder()
-                        .dataList(projects.stream()
-                                .map(project -> {
-                                    ProjectListResponseDTO dto = modelMapper.map(project, ProjectListResponseDTO.class);
-                                    dto.setStatus(project.getReviewProjectStatus().toString());
-                                    return dto;
-                                })
-                                .collect(Collectors.toList()))
+                        .dataList(projectListResponseDTOS.getContent())
                         .pageInfoDTO(PageInfoDTO.withAll()
                                 .pageRequestDTO(pageRequestDTO)
-                                .total((int) projects.getTotalElements())
+                                .total((int) projectListResponseDTOS.getTotalElements())
                                 .build())
                         .build();
 
             case 2:
-                projects = projectRepository.findByReviewStatusAndProgressStatus(ProjectStatus.승인, ProjectStatus.펀딩중, pageRequestDTO.getPageable());
-                return getProjectListResponseDTOPageListResponseDTO(pageRequestDTO, projects);
+                projectListResponseDTOS = projectRepository.findByReviewStatusAndProgressStatus(makerId, ProjectStatus.승인, ProjectStatus.펀딩중, pageRequestDTO.getPageable());
+                return getProjectListResponseDTOPageListResponseDTO(pageRequestDTO, projectListResponseDTOS);
 
             case 3:
-                    projects = projectRepository.findByProgressStatuses(List.of(ProjectStatus.성공, ProjectStatus.미달성), pageRequestDTO.getPageable());
-                return getProjectListResponseDTOPageListResponseDTO(pageRequestDTO, projects);
+                projectListResponseDTOS = projectRepository.findByProgressStatuses(makerId, List.of(ProjectStatus.성공, ProjectStatus.미달성), pageRequestDTO.getPageable());
+                return getProjectListResponseDTOPageListResponseDTO(pageRequestDTO, projectListResponseDTOS);
             default:
                 //not allowed
                 return null;
@@ -280,15 +278,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
-    private PageListResponseDTO<ProjectListResponseDTO> getProjectListResponseDTOPageListResponseDTO(PageRequestDTO pageRequestDTO, Page<Project> projects) {
+    private PageListResponseDTO<ProjectListResponseDTO> getProjectListResponseDTOPageListResponseDTO(PageRequestDTO pageRequestDTO, Page<ProjectListResponseDTO> projects) {
         return PageListResponseDTO.<ProjectListResponseDTO>builder()
-                .dataList(projects.stream()
-                        .map(project -> {
-                            ProjectListResponseDTO dto = modelMapper.map(project, ProjectListResponseDTO.class);
-                            dto.setStatus(project.getProgressProjectStatus().toString());
-                            return dto;
-                        })
-                        .collect(Collectors.toList()))
+                .dataList(projects.getContent())
                 .pageInfoDTO(PageInfoDTO.withAll()
                         .pageRequestDTO(pageRequestDTO)
                         .total((int) projects.getTotalElements())

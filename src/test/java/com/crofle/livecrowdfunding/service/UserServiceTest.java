@@ -31,7 +31,6 @@ public class UserServiceTest {
         Long id = 1L;
 
         UserInfoRequestDTO userInfoRequestDTO = UserInfoRequestDTO.builder()
-                .name("홍길동1")
                 .nickname("홍길동1")
                 .phone("010-1234-5678")
                 .address("서울시 강남구")

@@ -1,5 +1,6 @@
 package com.crofle.livecrowdfunding.dto.response;
 
+import com.crofle.livecrowdfunding.domain.enums.ProjectStatus;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.*;
 import org.springframework.cglib.core.Local;
@@ -17,7 +18,7 @@ public class ProjectListResponseDTO {
     private Long id;
     private String productName;
     private LocalDateTime startAt;
-    private String status;
-    private Integer totalPrice;
+    private ProjectStatus status;
+    private Long totalPrice;
     private Integer percentage;
 }

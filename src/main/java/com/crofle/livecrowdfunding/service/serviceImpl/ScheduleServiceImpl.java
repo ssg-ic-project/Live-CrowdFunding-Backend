@@ -92,7 +92,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     public List<ScheduleChartResponseDTO> getScheduleChart(LocalDateTime nowDate) {
 
         LocalDateTime endDate = nowDate.plusDays(7);
-        LocalDateTime startDate = nowDate.plusDays(1).withHour(0).withMinute(0).withSecond(0);
+        LocalDateTime startDate = nowDate.withHour(0).withMinute(0).withSecond(0);
 
         List<Object[]> schedules = scheduleRepository.findScheduleChart(startDate, endDate);
 

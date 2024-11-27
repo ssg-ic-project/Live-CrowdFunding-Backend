@@ -136,11 +136,8 @@ public class ProjectServiceTest {
 
     @Test
     public void testFindProjectList() {
-        ProjectListRequestDTO requestDTO = ProjectListRequestDTO.builder()
-                .statusNumber(1)
-                .build();
 
-        List<ProjectListResponseDTO> projectList = projectService.getProjectList(requestDTO, PageRequestDTO.builder().page(1).size(2).build()).getDataList();
+        List<ProjectListResponseDTO> projectList = projectService.getProjectList(1L,1, PageRequestDTO.builder().page(1).size(5).build()).getDataList();
         log.info(projectList);
     }
 

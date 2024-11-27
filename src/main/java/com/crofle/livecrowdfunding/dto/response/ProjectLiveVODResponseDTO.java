@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProjectLiveVODResponseDTO {
     private Long projectId;
+    private Long scheduleId;
     private String imageUrl;
     private String productName;
     private Integer percentage;
