@@ -20,7 +20,7 @@ public interface ProjectService {
 
     void updateProject(Long id, ProjectUpdateRequestDTO requestDTO);
 
-    PageListResponseDTO<ProjectListResponseDTO> getProjectList(ProjectListRequestDTO requestDTO, PageRequestDTO pageRequestDTO);
+    PageListResponseDTO<ProjectListResponseDTO> getProjectList(Long id, int statusNumber, PageRequestDTO pageRequestDTO);
 
     ProjectMainResponseDTO getMainProjects();
 

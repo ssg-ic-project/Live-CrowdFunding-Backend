@@ -136,7 +136,7 @@ public class TestEntity {
     public void projectTest() {
 
         //Maker
-        Maker maker = Maker.builder().name("yejina").phone("010-1234-5678").business(12318282).email("test4@test.com").password("Test123!@").zipcode(12345).address("서울시 강남구").detailAddress("테헤란로 123").registeredAt(LocalDateTime.now()).status(UserStatus.활성화).build();
+        Maker maker = Maker.builder().name("yejina").phone("010-1234-5678").business(12318282L).email("test4@test.com").password("Test123!@").zipcode(12345).address("서울시 강남구").detailAddress("테헤란로 123").registeredAt(LocalDateTime.now()).status(UserStatus.활성화).build();
         Maker savedMaker = makerRepository.save(maker);
         Maker foundMaker = makerRepository.findById(savedMaker.getId()).orElseThrow(() -> new RuntimeException("Not present"));
         System.out.println("Saved Maker ID: " + savedMaker.getId());
@@ -267,7 +267,7 @@ public class TestEntity {
 
     @Test
     public void SaveMakerTest() {
-        Maker maker = Maker.builder().name("테스트메이커").phone("010-1234-5678").business(123456).email("aa@.com").password("1234").zipcode(12345).address("서울시 강남구").detailAddress("테헤란로 123").unregisteredAt(LocalDateTime.now()).registeredAt(LocalDateTime.now()).status(UserStatus.활성화).build();
+        Maker maker = Maker.builder().name("테스트메이커").phone("010-1234-5678").business(123456L).email("aa@.com").password("1234").zipcode(12345).address("서울시 강남구").detailAddress("테헤란로 123").unregisteredAt(LocalDateTime.now()).registeredAt(LocalDateTime.now()).status(UserStatus.활성화).build();
         Maker savedMaker = makerRepository.save(maker);
         log.info(savedMaker);
     }

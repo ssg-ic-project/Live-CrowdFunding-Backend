@@ -74,7 +74,7 @@ public class User {
     private List<UserInterest> interests = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Liked> likes = new ArrayList<>();
 
     @Builder.Default
@@ -86,7 +86,6 @@ public class User {
     private List<ChatReport> chatReports = new ArrayList<>();
 
     public void updateUserInfo(UserInfoRequestDTO userInfoRequestDTO) {
-        this.name = userInfoRequestDTO.getName();
         this.nickname = userInfoRequestDTO.getNickname();
         this.phone = userInfoRequestDTO.getPhone();
         this.address = userInfoRequestDTO.getAddress();

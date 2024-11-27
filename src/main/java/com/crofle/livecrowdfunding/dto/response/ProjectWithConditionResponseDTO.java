@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProjectWithConditionResponseDTO { //검색 및 카테고리로 접속 시 보여지는 리스트 dto 근데 live dto랑 같아서 합쳐도 될듯
     private Long projectId;
+    private Long scheduleId;
     private String imageUrl;
     private String productName;
     private Integer percentage;

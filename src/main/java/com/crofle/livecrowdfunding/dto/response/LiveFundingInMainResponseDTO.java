@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LiveFundingInMainResponseDTO {
     private Long id;
+    private Long scheduleId;
     private String url;
     private String productName;
     private Integer percentage;

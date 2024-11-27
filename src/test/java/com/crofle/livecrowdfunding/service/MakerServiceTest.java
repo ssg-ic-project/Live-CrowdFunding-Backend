@@ -42,7 +42,7 @@ public class MakerServiceTest {
 
         saveMakerRequestDTO.setName("곽하몰리이");
         saveMakerRequestDTO.setPhone("010-1234-5678");
-        saveMakerRequestDTO.setBusiness(1234123);
+        saveMakerRequestDTO.setBusiness(12341L);
         saveMakerRequestDTO.setEmail("q1w2e3r4@sdsnaver.com");
         saveMakerRequestDTO.setPassword("1234");
         saveMakerRequestDTO.setZipcode(12345);
