@@ -18,9 +18,15 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectDetailResponseDTO> getProject(@PathVariable Long id, @RequestParam Long userId) {
+    public ResponseEntity<ProjectDetailWithLikedResponseDTO> getProjectForDetail(@PathVariable Long id, @RequestParam Long userId) {
 
         return ResponseEntity.ok(projectService.getProjectForUser(id, userId));
+    }
+
+    @GetMapping("/{id}/live")
+    public ResponseEntity<ProjectDetailResponseDTO> getProjectForLive(@PathVariable Long id) {
+
+        return ResponseEntity.ok(projectService.getProjectForLive(id));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

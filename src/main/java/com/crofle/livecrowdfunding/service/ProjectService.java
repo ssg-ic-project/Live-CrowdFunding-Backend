@@ -9,7 +9,9 @@ import java.util.List;
 
 public interface ProjectService {
   
-    ProjectDetailResponseDTO getProjectForUser(Long id, Long userId);
+    ProjectDetailWithLikedResponseDTO getProjectForUser(Long id, Long userId);
+
+    ProjectDetailResponseDTO getProjectForLive(Long id);
 
     void createProject(ProjectRegisterRequestDTO requestDTO, List<MultipartFile> images, List<MultipartFile> documents);
 

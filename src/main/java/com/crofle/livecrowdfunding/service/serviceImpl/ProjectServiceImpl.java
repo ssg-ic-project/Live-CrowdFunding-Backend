@@ -32,7 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -71,17 +70,28 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public ProjectDetailResponseDTO getProjectForUser(Long id, Long userId) {
+    public ProjectDetailWithLikedResponseDTO getProjectForUser(Long id, Long userId) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("프로젝트 조회에 실패했습니다"));
+
+        ProjectDetailWithLikedResponseDTO projectDetailWithLikedResponseDTO = modelMapper.map(project, ProjectDetailWithLikedResponseDTO.class);
+        projectDetailWithLikedResponseDTO.setMaker(project.getMaker().getName());
+        projectDetailWithLikedResponseDTO.setCategory(project.getCategory().getClassification());
+        //우선 같이 가져오지만 비동기 처리 고려
+        projectDetailWithLikedResponseDTO.setLikeCount(project.getLikes().size());
+        projectDetailWithLikedResponseDTO.setIsLiked(project.getLikes().stream()
+                .anyMatch(like -> like.getUser().getId().equals(userId)));
+
+        return projectDetailWithLikedResponseDTO;
+    }
+
+    @Override
+    public ProjectDetailResponseDTO getProjectForLive(Long id) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("프로젝트 조회에 실패했습니다"));
 
         ProjectDetailResponseDTO projectDetailResponseDTO = modelMapper.map(project, ProjectDetailResponseDTO.class);
         projectDetailResponseDTO.setMaker(project.getMaker().getName());
-        projectDetailResponseDTO.setCategory(project.getCategory().getClassification());
-        //우선 같이 가져오지만 비동기 처리 고려
-        projectDetailResponseDTO.setLikeCount(project.getLikes().size());
-        projectDetailResponseDTO.setIsLiked(project.getLikes().stream()
-                .anyMatch(like -> like.getUser().getId().equals(userId)));
 
         return projectDetailResponseDTO;
     }
