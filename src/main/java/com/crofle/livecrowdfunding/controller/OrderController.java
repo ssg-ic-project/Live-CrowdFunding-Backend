@@ -5,7 +5,6 @@ import com.crofle.livecrowdfunding.dto.request.PageRequestDTO;
 import com.crofle.livecrowdfunding.dto.response.OrderHistoryResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.OrderResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.PageListResponseDTO;
-import com.crofle.livecrowdfunding.dto.response.ProjectDetailResponseDTO;
 import com.crofle.livecrowdfunding.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

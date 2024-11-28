@@ -5,13 +5,10 @@ import com.crofle.livecrowdfunding.domain.enums.ProjectStatus;
 import com.crofle.livecrowdfunding.dto.request.*;
 import com.crofle.livecrowdfunding.dto.response.*;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cglib.core.Local;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @SpringBootTest
@@ -24,8 +21,8 @@ public class ProjectServiceTest {
     public void testFindProjectDetail() {
         Long id = 1L;
         Long userId = 1L;
-        ProjectDetailResponseDTO projectDetailResponseDTO = projectService.getProjectForUser(id, userId);
-        log.info(projectDetailResponseDTO);
+        ProjectDetailWithLikedResponseDTO projectDetailWithLikedResponseDTO = projectService.getProjectForUser(id, userId);
+        log.info(projectDetailWithLikedResponseDTO);
     }
 
     @Test
