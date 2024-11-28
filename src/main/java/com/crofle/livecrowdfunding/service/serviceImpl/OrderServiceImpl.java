@@ -42,13 +42,12 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDTO createOrder(OrderRequestDTO orderRequestDTO) {
         User user = findUser(orderRequestDTO.getUserId());
         Project project = findProject(orderRequestDTO.getProjectId());
-        int paymentPrice = calculatePaymentPrice(orderRequestDTO.getAmount(), project.getPrice());
 
         Orders order = Orders.builder().
                 user(user).
                 project(project).
                 amount(orderRequestDTO.getAmount()).
-                paymentPrice(paymentPrice).
+                paymentPrice(orderRequestDTO.getTotalPrice()).
                 build();
 
         order = ordersRepository.save(order);
@@ -85,12 +84,5 @@ public class OrderServiceImpl implements OrderService {
     private Project findProject(Long projectId) {
         return projectRepository.findById(projectId)
                 .orElseThrow(() -> new EntityNotFoundException("프로젝트를 찾을 수 없습니다. ID: " + projectId));
-    }
-
-    private int calculatePaymentPrice(int amount, int projectPrice) {
-        if (amount <= 0) {
-            throw new IllegalArgumentException("수량은 0보다 커야 합니다.");
-        }
-        return amount * projectPrice;
     }
 }

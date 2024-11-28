@@ -4,8 +4,10 @@ import com.crofle.livecrowdfunding.dto.request.*;
 import com.crofle.livecrowdfunding.dto.response.*;
 import com.crofle.livecrowdfunding.service.ProjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,18 +18,21 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectDetailResponseDTO> getProject(@PathVariable Long id) {
+    public ResponseEntity<ProjectDetailResponseDTO> getProject(@PathVariable Long id, @RequestParam Long userId) {
 
-        return ResponseEntity.ok(projectService.getProjectForUser(id));
+        return ResponseEntity.ok(projectService.getProjectForUser(id, userId));
     }
 
-    @PostMapping
-    public ResponseEntity<Void> createProject(@RequestBody ProjectRegisterRequestDTO requestDTO) {
-        projectService.createProject(requestDTO);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> createProject(
+            @RequestPart ProjectRegisterRequestDTO requestDTO,
+            @RequestPart(required = false) List<MultipartFile> images,
+            @RequestPart(required = false) List<MultipartFile> documents) {
+        projectService.createProject(requestDTO, images, documents);
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("{id}/status/")
+    @PatchMapping("{id}/status")
     public ResponseEntity<Void> updateProjectStatus(@PathVariable Long id, @RequestBody ProjectStatusRequestDTO requestDTO) {
         projectService.updateProjectStatus(id, requestDTO);
         return ResponseEntity.ok().build();
