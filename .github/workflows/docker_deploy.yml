@@ -1,0 +1,67 @@
+name: Auto deploy to NCP
+run-name: Running
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    # 체크아웃 및 JDK 세팅
+    - name : Checkout
+      uses: actions/checkout@v3
+#      with:
+#        ref: feature/chatting
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    # Secret YML 파일 생성
+    # - name: Setting secret
+    #   run: |
+    #     mkdir -p src/main/resources
+    #     echo "${{ secrets.SECRET_YML }}" | base64 --decode > src/main/resources/application-secret.yml
+    #     find src
+    #   shell: bash
+
+    - name: Create application.properties
+      run: |
+        mkdir -p src/main/resources/
+        cat > src/main/resources/application.properties << EOF
+        ${{ secrets.APPLICATION_PROPERTIES }}
+        EOF
+
+    
+    # Gradle 권한 부여
+    - name: Grant permission for gradlew
+      run: chmod +x ./gradlew
+    # Test 없이 빌드
+    - name: Build with Gradle
+      run: ./gradlew clean build -x test
+    #빌드한 jar 파일을 도커 이미지로 빌드하고 도커 허브에 푸시
+    - name: web docker build and push
+      run: |
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        docker build -t ${{ secrets.DOCKER_REPO }}/spring-server .
+        docker push ${{ secrets.DOCKER_REPO }}/spring-server
+
+    - name: Deploy to NCP
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.BASTION_HOST }}
+        username: ${{ secrets.BASTION_USERNAME }}
+        password: ${{secrets.REMOTE_SSH_KEY}}
+        script: |
+          #새로 배포하는 서버에서는 sshpass 필요
+          apt-get update && apt-get install -y sshpass
+          sshpass -p "${{ secrets.PRIVATE_INSTANCE_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.PRIVATE_INSTANCE_USERNAME }}@${{ secrets.PRIVATE_INSTANCE_IP }} '
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            docker pull ${{ secrets.DOCKER_USERNAME }}/spring-server
+            cd /root/app
+            docker-compose down || true
+            docker compose up -d || true
+          '

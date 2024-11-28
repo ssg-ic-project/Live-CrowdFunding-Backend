@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -23,17 +22,27 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectDetailResponseDTO> getProject(@PathVariable Long id) {
-        return ResponseEntity.ok(projectService.getProjectForUser(id));
+    public ResponseEntity<ProjectDetailWithLikedResponseDTO> getProjectForDetail(@PathVariable Long id, @RequestParam Long userId) {
+
+        return ResponseEntity.ok(projectService.getProjectForUser(id, userId));
     }
 
-    @PostMapping
-    public ResponseEntity<Void> createProject(@RequestBody ProjectRegisterRequestDTO requestDTO) {
-        projectService.createProject(requestDTO);
+    @GetMapping("/{id}/live")
+    public ResponseEntity<ProjectDetailResponseDTO> getProjectForLive(@PathVariable Long id) {
+
+        return ResponseEntity.ok(projectService.getProjectForLive(id));
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> createProject(
+            @RequestPart ProjectRegisterRequestDTO requestDTO,
+            @RequestPart(required = false) List<MultipartFile> images,
+            @RequestPart(required = false) List<MultipartFile> documents) {
+        projectService.createProject(requestDTO, images, documents);
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("{id}/status/")
+    @PatchMapping("{id}/status")
     public ResponseEntity<Void> updateProjectStatus(@PathVariable Long id, @RequestBody ProjectStatusRequestDTO requestDTO) {
         projectService.updateProjectStatus(id, requestDTO);
         return ResponseEntity.ok().build();
@@ -55,9 +64,30 @@ public class ProjectController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<PageListResponseDTO<ProjectListResponseDTO>> getProjectList(@RequestBody ProjectListRequestDTO requestDTO, @ModelAttribute PageRequestDTO pageRequestDTO) {
-        return ResponseEntity.ok(projectService.getProjectList(requestDTO, pageRequestDTO));
+    @GetMapping("/list/{id}")
+    public ResponseEntity<PageListResponseDTO<ProjectListResponseDTO>> getProjectListByStatus(@PathVariable Long id, @RequestParam int statusNumber, @ModelAttribute PageRequestDTO pageRequestDTO) {
+        return ResponseEntity.ok(projectService.getProjectList(id, statusNumber, pageRequestDTO));
+    }
+
+    // 메인 페이지
+    @GetMapping("/main")
+    public ResponseEntity<ProjectMainResponseDTO> getMainProjectList() {
+        return ResponseEntity.ok(projectService.getMainProjects());
+    }
+
+    @GetMapping("/live-vod")
+    public ResponseEntity<List<ProjectLiveVODResponseDTO>> getLiveAndVODProjectList() {
+        return ResponseEntity.ok(projectService.getLiveAndVODProjectList());
+    }
+
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<PageListResponseDTO<ProjectWithConditionResponseDTO>> getCategoryProjects(@PathVariable Long categoryId, @ModelAttribute PageRequestDTO pageRequestDTO) {
+        return ResponseEntity.ok(projectService.getCategoryProjects(categoryId, pageRequestDTO));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<PageListResponseDTO<ProjectWithConditionResponseDTO>> getSearchProjects(@RequestParam String keyword, @ModelAttribute PageRequestDTO pageRequestDTO) {
+        return ResponseEntity.ok(projectService.getSearchProjects(keyword, pageRequestDTO));
     }
 
     //프로젝트 등록하기

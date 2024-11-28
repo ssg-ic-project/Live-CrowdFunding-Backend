@@ -31,10 +31,10 @@ public class Maker {
     @Column(nullable = false)
     private Integer business;
 
-    @Column(length = 30, nullable = false)
+    @Column(length = 255, nullable = false)
     private String email;
 
-    @Column(length = 20, nullable = false)
+    @Column(length = 255, nullable = false)
     private String password;
 
     @Column(nullable = false)

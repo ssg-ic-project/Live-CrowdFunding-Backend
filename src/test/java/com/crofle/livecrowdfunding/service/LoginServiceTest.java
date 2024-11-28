@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Copy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -20,6 +21,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -300,6 +302,28 @@ public class LoginServiceTest {
         // When & Then
         assertTrue(accountService.validateResetToken(token), "토큰 검증에 실패했습니다.");
         assertFalse(accountService.validateResetToken(token), "사용된 토큰이 재사용 가능합니다.");
+    }
+
+    @Test
+    @DisplayName("암호화 테스트")
+    public void testPasswordEncryption() {
+        String rawPassword = "1234";
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encodedPassword = encoder.encode(rawPassword);
+
+        log.info("\n\n===== 비밀번호 암호화 테스트 시작 =====\n");
+        log.info("원본 비밀번호: {}", rawPassword);
+        log.info("암호화된 비밀번호: {}", encodedPassword);
+
+        // DB에 저장된 비밀번호와 비교
+        String storedPassword = "$2a$10$sUV8I.BGzR6OiwGx9N6QgehwzGaPqwMYZRoCbcVvW5m0R6kg0FjpC";
+        boolean matches = encoder.matches(rawPassword, storedPassword);
+
+        log.info("DB 저장 비밀번호: {}", storedPassword);
+        log.info("비밀번호 일치 여부: {}", matches);
+
+        assertTrue(encoder.matches(rawPassword, encodedPassword));
+        log.info("\n===== 비밀번호 암호화 테스트 종료 =====\n");
     }
 
 }

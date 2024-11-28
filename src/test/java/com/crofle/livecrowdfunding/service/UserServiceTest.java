@@ -19,7 +19,7 @@ public class UserServiceTest {
 
     @Test
     public void findUserTest() {
-        Long userId = 7L;
+        Long userId = 1L;
 
         UserInfoResponseDTO userInfoResponseDTO = userService.findUser(userId);
 
@@ -31,7 +31,6 @@ public class UserServiceTest {
         Long id = 1L;
 
         UserInfoRequestDTO userInfoRequestDTO = UserInfoRequestDTO.builder()
-                .name("홍길동1")
                 .nickname("홍길동1")
                 .phone("010-1234-5678")
                 .address("서울시 강남구")
@@ -44,7 +43,7 @@ public class UserServiceTest {
 
     @Test
     public void deleteUserTest() {
-        Long userId = 9L;
+        Long userId = 6L;
 
         userService.deleteUser(userId);
     }

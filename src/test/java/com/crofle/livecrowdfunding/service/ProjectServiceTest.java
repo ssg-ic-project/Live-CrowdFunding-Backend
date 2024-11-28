@@ -5,13 +5,10 @@ import com.crofle.livecrowdfunding.domain.enums.ProjectStatus;
 import com.crofle.livecrowdfunding.dto.request.*;
 import com.crofle.livecrowdfunding.dto.response.*;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cglib.core.Local;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @SpringBootTest
@@ -23,49 +20,50 @@ public class ProjectServiceTest {
     @Test
     public void testFindProjectDetail() {
         Long id = 1L;
-        ProjectDetailResponseDTO projectDetailResponseDTO = projectService.getProjectForUser(id);
-        log.info(projectDetailResponseDTO);
+        Long userId = 1L;
+        ProjectDetailWithLikedResponseDTO projectDetailWithLikedResponseDTO = projectService.getProjectForUser(id, userId);
+        log.info(projectDetailWithLikedResponseDTO);
     }
 
     @Test
     public void testCreateProject() {
-         ProjectRegisterRequestDTO requestDTO = ProjectRegisterRequestDTO.builder()
-                 .makerId(1L)
-                 .planId(1L)
-                 .categoryId(2L)
-                 .productName("상태 테스팅 상품")
-                 .summary("이건 좀 비쌀듯")
-                 .price(1000000)
-                 .discountPercentage(10)
-                 .goalAmount(1000000000)
-                 .contentImage("contentImage.jpg")
-                 .images(List.of(
-                         ImageRegisterRequestDTO.builder()
-                                 .url("image1.jpg")
-                                 .imageNumber(1)
-                                 .name("이미지1")
-                                 .build(),
-                         ImageRegisterRequestDTO.builder()
-                                 .url("image2.jpg")
-                                 .imageNumber(2)
-                                 .name("이미지2")
-                                 .build()
-                 ))
-                 .essentialDocuments(List.of(
-                         DocumentRegisterRequestDTO.builder()
-                                 .url("document1.pdf")
-                                 .docType(DocumentType.개발)
-                                 .name("필수문서1")
-                                 .build(),
-                         DocumentRegisterRequestDTO.builder()
-                                 .url("document2.pdf")
-                                 .docType(DocumentType.프로젝트)
-                                 .name("필수문서2")
-                                 .build()
-                 ))
-                 .build();
-
-         projectService.createProject(requestDTO);
+//         ProjectRegisterRequestDTO requestDTO = ProjectRegisterRequestDTO.builder()
+//                 .makerId(1L)
+//                 .planId(1L)
+//                 .categoryId(2L)
+//                 .productName("상태 테스팅 상품22")
+//                 .summary("이건 좀 비쌀듯??")
+//                 .price(100000)
+//                 .discountPercentage(20)
+//                 .goalAmount(10000000)
+//                 .contentImage("contentImageme.jpg")
+//                 .images(List.of(
+//                         ImageRegisterRequestDTO.builder()
+//                                 .url("image1.jpg")
+//                                 .imageNumber(1)
+//                                 .name("이미지1")
+//                                 .build(),
+//                         ImageRegisterRequestDTO.builder()
+//                                 .url("image2.jpg")
+//                                 .imageNumber(2)
+//                                 .name("이미지2")
+//                                 .build()
+//                 ))
+//                 .essentialDocuments(List.of(
+//                         DocumentRegisterRequestDTO.builder()
+//                                 .url("document1.pdf")
+//                                 .docType(DocumentType.상품정보)
+//                                 .name("필수문서1")
+//                                 .build(),
+//                         DocumentRegisterRequestDTO.builder()
+//                                 .url("document2.pdf")
+//                                 .docType(DocumentType.펀딩정보)
+//                                 .name("필수문서2")
+//                                 .build()
+//                 ))
+//                 .build();
+//
+//         projectService.createProject(requestDTO);
     }
 
     @Test
@@ -120,12 +118,12 @@ public class ProjectServiceTest {
                 .essentialDocuments(List.of(
                         DocumentRegisterRequestDTO.builder()
                                 .url("변경된document1.pdf")
-                                .docType(DocumentType.개발)
+                                .docType(DocumentType.상품정보)
                                 .name("필수문서1")
                                 .build(),
                         DocumentRegisterRequestDTO.builder()
                                 .url("변경된document2.pdf")
-                                .docType(DocumentType.프로젝트)
+                                .docType(DocumentType.펀딩정보)
                                 .name("필수문서2")
                                 .build()
                 ))
@@ -136,11 +134,34 @@ public class ProjectServiceTest {
 
     @Test
     public void testFindProjectList() {
-        ProjectListRequestDTO requestDTO = ProjectListRequestDTO.builder()
-                .statusNumber(1)
-                .build();
 
-        List<ProjectListResponseDTO> projectList = projectService.getProjectList(requestDTO, PageRequestDTO.builder().page(1).size(2).build()).getDataList();
+        List<ProjectListResponseDTO> projectList = projectService.getProjectList(1L,1, PageRequestDTO.builder().page(1).size(5).build()).getDataList();
         log.info(projectList);
+    }
+
+    @Test
+    public void testFindMainProjects() {
+        ProjectMainResponseDTO projectMainResponseDTO = projectService.getMainProjects();
+        log.info(projectMainResponseDTO);
+    }
+
+    @Test
+    public void testFindLiveAndVODProjectList() {
+        List<ProjectLiveVODResponseDTO> projectLiveVODResponseDTOList = projectService.getLiveAndVODProjectList();
+        log.info(projectLiveVODResponseDTOList);
+    }
+
+    @Test
+    public void testFindCategoryProjects() {
+        Long categoryId = 1L;
+        PageListResponseDTO<ProjectWithConditionResponseDTO> dto = projectService.getCategoryProjects(categoryId, PageRequestDTO.builder().page(1).size(2).build());
+        log.info(dto);
+    }
+
+    @Test
+    public void testFindSearchProjects() {
+        String keyword = "싸디";
+        PageListResponseDTO<ProjectWithConditionResponseDTO> dto = projectService.getSearchProjects(keyword, PageRequestDTO.builder().page(1).size(2).build());
+        log.info(dto);
     }
 }

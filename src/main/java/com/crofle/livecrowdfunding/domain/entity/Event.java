@@ -26,7 +26,7 @@ public class Event {
     @Column(nullable = false, length = 30)
     private String name;
 
-    @Column(length = 30)
+    @Column(length = 50)
     private String content;
 
     @Column(nullable = false, length = 255)
