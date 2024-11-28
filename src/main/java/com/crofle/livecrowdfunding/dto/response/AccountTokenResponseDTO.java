@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountTokenResponseDTO {  // 토큰 재발급 응답
+    private Long accountId;
     private String accessToken;
     private String refreshToken;
     private String userEmail;

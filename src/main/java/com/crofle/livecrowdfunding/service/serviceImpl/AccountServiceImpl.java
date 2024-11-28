@@ -96,6 +96,7 @@ public class AccountServiceImpl implements AccountService {
         saveToken(account.getEmail(), accessToken, refreshToken);
 
         return AccountTokenResponseDTO.builder()
+                .accountId(account.getId())  // 이 부분 추가
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .userEmail(account.getEmail())
