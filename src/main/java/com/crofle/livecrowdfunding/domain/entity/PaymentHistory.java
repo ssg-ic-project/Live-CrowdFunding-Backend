@@ -27,7 +27,7 @@ public class PaymentHistory {
     @Column(name = "payment_method", nullable = false)
     private PaymentMethod paymentMethod;
 
-    @Column(name = "delivery_address", length = 30, nullable = false)
+    @Column(name = "delivery_address", length = 255, nullable = false)
     private String deliveryAddress;
 
     @Column(name = "payment_at", nullable = false)
