@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 // 로그인 응답 (토큰 정보 포함)
 public class AccountLoginResponseDTO {
+    private Long accountId;
     private String accessToken;
     private String refreshToken;
     private String userEmail;

@@ -16,6 +16,8 @@
     import org.springframework.web.bind.annotation.*;
     import org.springframework.web.multipart.MultipartFile;
 
+    import java.net.URLEncoder;
+    import java.nio.charset.StandardCharsets;
     import java.util.Map;
     import java.util.UUID;
 
@@ -160,17 +162,14 @@
         @GetMapping("/oauth/naver")
         public ResponseEntity<String> getNaverLoginUrl() {
             String state = UUID.randomUUID().toString();
-            String naverLoginUrl = String.format("%s" +
-                            "?response_type=code" +
-                            "&client_id=%s" +
-                            "&redirect_uri=%s" +
-                            "&state=%s",
-                    naverAuthBaseUrl,
+            String naverLoginUrl = String.format("%s?response_type=code&client_id=%s&redirect_uri=%s&state=%s",
+                    naverAuthBaseUrl.trim(),
                     naverClientId,
-                    naverRedirectUri,
-                    state);
+                    URLEncoder.encode(naverRedirectUri, StandardCharsets.UTF_8),
+                    state
+            );
 
-            log.info("Generated Naver login URL with state: {}", state);
+            log.info("Generated Naver login URL: {}", naverLoginUrl);
             return ResponseEntity.ok(naverLoginUrl);
         }
 

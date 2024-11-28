@@ -13,4 +13,5 @@ public class OrderRequestDTO {
     private Long userId;
     private Long projectId;
     private Integer amount;
+    private Integer totalPrice;
 }
