@@ -30,30 +30,13 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class VideoService {
-    @Value("${ncp.storage.endpoint}")
-    private String endPoint;
-
-    @Value("${ncp.storage.region}")
-    private String region;
-
-    @Value("${ncp.storage.access-key}")
-    private String accessKey;
-
-    @Value("${ncp.storage.secret-key}")
-    private String secretKey;
 
     @Value("${ncp.storage.bucket}")
     private String bucket;
 
     private final VideoRepository videoRepository;
     private final ScheduleRepository scheduleRepository;
-
-    private AmazonS3 getS3Client() {
-        return AmazonS3ClientBuilder.standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endPoint, region))
-                .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
-                .build();
-    }
+    private final AmazonS3 amazonS3;
 
     @Transactional
     public Video uploadVideo(MultipartFile file, Long scheduleId) {
@@ -73,7 +56,6 @@ public class VideoService {
     private String uploadToNcp(MultipartFile file) {
         log.info(String.valueOf(file));
 
-        AmazonS3 s3 = getS3Client();
         String folderName = "videos/";
         String fileName = folderName + UUID.randomUUID() + "_" + file.getOriginalFilename();
 
@@ -82,7 +64,7 @@ public class VideoService {
             ObjectMetadata folderMetadata = new ObjectMetadata();
             folderMetadata.setContentLength(0L);
             folderMetadata.setContentType("application/x-directory");
-            s3.putObject(new PutObjectRequest(bucket, folderName,
+            amazonS3.putObject(new PutObjectRequest(bucket, folderName,
                     new ByteArrayInputStream(new byte[0]), folderMetadata));
 
             // Upload file
@@ -90,7 +72,7 @@ public class VideoService {
             fileMetadata.setContentType(file.getContentType());
             fileMetadata.setContentLength(file.getSize());
 
-            s3.putObject(new PutObjectRequest(bucket, fileName,
+            amazonS3.putObject(new PutObjectRequest(bucket, fileName,
                     file.getInputStream(), fileMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
 
