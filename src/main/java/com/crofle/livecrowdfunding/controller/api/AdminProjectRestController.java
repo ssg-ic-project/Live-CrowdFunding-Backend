@@ -32,7 +32,8 @@ public class AdminProjectRestController {
             @RequestParam(required = false) String SD,
             @RequestParam(required = false) String ED,
             @RequestParam(required = false) String projname) {
-
+        log.info("yejin project check");
+        log.info(SD);
         SearchTypeDTO searchTypeDTO = SearchTypeDTO.builder()
                 .RS(RS)
                 .PS(PS)

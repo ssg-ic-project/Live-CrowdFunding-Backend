@@ -25,6 +25,8 @@ public class AdminChatRestController {
         PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
                 .page(page)
                 .build();
+
+
         return ResponseEntity.ok(adminChatReportService.findReportList(pageRequestDTO));
     }
 
@@ -42,6 +44,8 @@ public class AdminChatRestController {
             @RequestBody UserStatusRequestDTO updateDTO) {
         // reportId를 통해 userId 조회
         Long userId = adminChatReportService.getUserIdByReportId(reportId);
+
+        log.info("updateDTO 확인용, yejin: ", updateDTO);
 
         // 조회한 userId를 updateDTO에 설정
         updateDTO.setUserId(userId);

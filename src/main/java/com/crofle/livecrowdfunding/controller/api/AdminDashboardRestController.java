@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Log4j2
@@ -25,7 +26,9 @@ public class AdminDashboardRestController {
     //refactoring시: 동시성 제어 사용시 axios사용??
     @GetMapping("/dashboard/stats")
     public ResponseEntity<ProjectStatisticsResponseDTO>getStats(){
-        return ResponseEntity.ok(dashBoardService.getProjectStatistics());
+        log.info("got request");
+        ProjectStatisticsResponseDTO dto = dashBoardService.getProjectStatistics();
+        return ResponseEntity.ok(dto);
     }
 
     //월별(최근 12개월) 신규 가입자 수 (일반회원, 메이커, 총계)
@@ -37,7 +40,8 @@ public class AdminDashboardRestController {
                 .makers(dashBoardService.getNewMakerStats(oneYearAgo, now))
                 .total(dashBoardService.getNewTotalStats(oneYearAgo, now))
                 .build();
-
+        log.info("checking for makers");
+        log.info(userStats.getMakers());
         return ResponseEntity.ok(userStats);
     }
 
@@ -71,8 +75,16 @@ public class AdminDashboardRestController {
     //카테고리별 펀딩 수와 수익
     @GetMapping("/dashboard/revenue-by-category")
     public ResponseEntity<CategoryRevenueResponseDTO>getCategoryRevenue(){
+        List<CategoryStatsResponseDTO> categoryStats = dashBoardService.getCategoryStats();
+
+        // 카테고리 리스트 추출
+        List<String> labels = categoryStats.stream()
+                .map(CategoryStatsResponseDTO::getCategory)
+                .collect(Collectors.toList());
+
         CategoryRevenueResponseDTO result = CategoryRevenueResponseDTO.builder()
-                .catrevenue(dashBoardService.getCategoryStats())
+                .labels(labels)
+                .catrevenue(categoryStats)
                 .build();
 
         return ResponseEntity.ok(result);

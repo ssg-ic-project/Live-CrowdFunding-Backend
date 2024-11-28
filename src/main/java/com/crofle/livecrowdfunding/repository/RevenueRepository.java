@@ -19,12 +19,9 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
             UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8
             UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11) numbers
     ) d
-    LEFT JOIN Project p ON DATE_FORMAT(p.end_at, '%Y-%m') = d.month AND p.progress_status = '성공'
-    LEFT JOIN Rate_Plan pl ON p.plan_id = pl.id GROUP BY d.month ORDER BY d.month """, nativeQuery = true)
-
-    List<Object[]> calculateMonthlyRevenue(
-            @Param("startDate") LocalDateTime startDate
-    );
+    LEFT JOIN project p ON DATE_FORMAT(p.end_at, '%Y-%m') = d.month AND p.progress_status = '성공'
+    LEFT JOIN rate_plan pl ON p.plan_id = pl.id GROUP BY d.month ORDER BY d.month """, nativeQuery = true)
+    List<Object[]> calculateMonthlyRevenue(@Param("startDate") LocalDateTime startDate);
 
     //카테고리별 월간 성공 프로젝트 수 & 수익
     @Query(value = """
@@ -32,11 +29,11 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
         c.classification as category_name,
         COUNT(p.id) as success_count,
         COALESCE(ROUND(SUM(p.price * p.percentage / 100 * pl.charge / 100)), 0) as revenue
-    FROM Category c
-    LEFT JOIN Project p ON c.id = p.category_id 
+    FROM category c
+    LEFT JOIN project p ON c.id = p.category_id 
         AND p.progress_status = '성공'
         AND DATE_FORMAT(p.end_at, '%Y-%m') = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m')
-    LEFT JOIN Rate_Plan pl ON p.plan_id = pl.id
+    LEFT JOIN rate_plan pl ON p.plan_id = pl.id
     GROUP BY c.classification
     ORDER BY c.classification
     """, nativeQuery = true)

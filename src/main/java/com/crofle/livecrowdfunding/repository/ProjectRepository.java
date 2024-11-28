@@ -65,8 +65,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                  
                 CAST((SELECT COUNT(p4.id) 
                  FROM Project p4 
-                 WHERE p4.reviewProjectStatus = com.crofle.livecrowdfunding.domain.enums.ProjectStatus.검토중
-                 AND DATE(p4.startAt) = CURRENT_DATE) AS Long),
+                 WHERE p4.reviewProjectStatus = com.crofle.livecrowdfunding.domain.enums.ProjectStatus.검토중) AS Long),
                  
                 CAST((SELECT COUNT(p5.id) 
                  FROM Project p5 
