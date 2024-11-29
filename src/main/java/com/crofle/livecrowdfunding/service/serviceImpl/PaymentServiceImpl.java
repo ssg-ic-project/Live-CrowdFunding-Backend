@@ -38,6 +38,7 @@ public class PaymentServiceImpl implements PaymentService {
             PaymentResponseDTO paymentResponseDTO = PaymentResponseDTO.builder()
                     .paymentMethod("계좌이체")
                     .orderId(Long.parseLong((String) jsonObject.get("orderId")))
+                    //.orderId((String) jsonObject.get("orderId"))
                     .paymentAt(localDateTime)
                     .deliveryAddress(address)
                     .build();

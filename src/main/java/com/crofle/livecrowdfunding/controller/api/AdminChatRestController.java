@@ -43,13 +43,15 @@ public class AdminChatRestController {
             @PathVariable Long reportId,
             @RequestBody UserStatusRequestDTO updateDTO) {
         // reportId를 통해 userId 조회
+        log.info("updateDTO 확인용, yejin: ", updateDTO);
         Long userId = adminChatReportService.getUserIdByReportId(reportId);
 
-        log.info("updateDTO 확인용, yejin: ", updateDTO);
+
 
         // 조회한 userId를 updateDTO에 설정
         updateDTO.setUserId(userId);
         updateDTO.setReportId(reportId);
+        log.info("check delete? ", updateDTO.isDeleteReport());
 
         adminChatReportService.updateUserStatus(updateDTO);
         return ResponseEntity.ok("사용자 상태가 변경되었습니다.");
