@@ -20,16 +20,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminUserMgmRestController {
 
     private final AdminUserMgmService adminUserMgmService;
-    @GetMapping("/users") //회원관리 유형: 판매자, 일반회원
+    @GetMapping("/usersList") //회원관리 유형: 판매자, 일반회원
     public ResponseEntity<PageListResponseDTO<UserMgmResponseDTO>> getUsers(
-            @RequestParam int page,
+            @RequestParam (defaultValue = "1") int page,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) String memberType,
-            @RequestParam(required = false) String name){
+            @RequestParam(required = false, defaultValue = "") String memberType,
+            @RequestParam(required = false, defaultValue = "") String name){
+        log.info("YYYYYEJIN", page);
+        log.info(status);
+        log.info(memberType);
+        log.info(name);
+
+
         SearchTypeDTO searchTypeDTO = SearchTypeDTO.builder()
                 .US(status)
                 .MT(memberType)
                 .build();
+
+        log.info(searchTypeDTO);
+
 
         PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
                 .page(page)
@@ -38,6 +47,7 @@ public class AdminUserMgmRestController {
                 .build();
 
         PageListResponseDTO<UserMgmResponseDTO> data = adminUserMgmService.getAllMembers(pageRequestDTO);
+        log.info("user check yejin: ", data);
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 }

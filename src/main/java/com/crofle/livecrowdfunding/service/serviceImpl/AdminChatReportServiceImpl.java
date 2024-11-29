@@ -107,6 +107,7 @@ public class AdminChatReportServiceImpl implements AdminChatReportService {
         if (updateDTO.isDeleteReport()) {
             ChatReport chatReport = chatReportRepository.findById(updateDTO.getReportId())
                     .orElseThrow(() -> new EntityNotFoundException("해당 신고 내역이 없습니다"));
+            log.info("chatreport delete check");
             chatReportRepository.delete(chatReport);
             return;
         }
@@ -116,6 +117,7 @@ public class AdminChatReportServiceImpl implements AdminChatReportService {
             case 비활성화 -> user.deactivateUser();
             case 정지 -> user.suspendUser();
         }
+        log.info("send email now");
         //이메일 전송 (사용자 이메일, 실시간 방송 이름, 직원 코멘트, 활성화일경우 1달 X사용, 정지는 평생)
         try{
             String duration = updateDTO.getStatus() == UserStatus.정지 ? "영구적으로": "1 개월동안";
@@ -138,6 +140,7 @@ public class AdminChatReportServiceImpl implements AdminChatReportService {
                  "운영시간: 평일 09:00-18:00 (공휴일 제외)\n",
                 status, duration, status == UserStatus.정지 ? "운영정책 위반" : "운영정책 미준수"
         );
+        log.info("cheeking email sending: ", message);
         emailService.sendEmail(email, subject, message);
         log.info("이메일 전송 완료");
     }

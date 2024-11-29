@@ -10,7 +10,8 @@ import java.util.List;
 @Setter
 @Builder
 //대시보드 신규 가입자 수를 위한 DTO
-public class UserGraphResponseDTO {
+public class
+UserGraphResponseDTO {
     private List<String> labels;
     private List<MonthlyUserCountResponseDTO> users;
     private List<MonthlyUserCountResponseDTO> makers;
