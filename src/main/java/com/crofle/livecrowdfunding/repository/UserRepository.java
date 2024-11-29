@@ -76,13 +76,20 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     //Total. 재귀쿼리사용하기
     @Query(value = """
-            WITH RECURSIVE months AS ( SELECT DATE_FORMAT(:startDate, '%Y-%m') as month, :startDate as date
-                UNION ALL SELECT DATE_FORMAT(DATE_ADD(date, INTERVAL 1 MONTH), '%Y-%m') as month, DATE_ADD(date, INTERVAL 1 MONTH) as date
-                FROM months WHERE month < DATE_FORMAT(:endDate, '%Y-%m'))
-            SELECT m.month, (SELECT COUNT(*) FROM users u WHERE u.status = '활성화' AND u.unregistered_at IS NULL 
-                 AND DATE_FORMAT(u.registered_at, '%Y-%m') <= m.month) + (SELECT COUNT(*) FROM maker mk 
-                 WHERE mk.status = '활성화' AND mk.unregistered_at IS NULL AND DATE_FORMAT(mk.registered_at, '%Y-%m') <= m.month) as total_active
-            FROM months m ORDER BY m.month """, nativeQuery = true)
+            WITH RECURSIVE months AS (
+                SELECT :startDate as date
+                UNION ALL
+                SELECT DATE_ADD(date, INTERVAL 1 MONTH) as date
+                FROM months
+                WHERE date < :endDate
+            )
+            SELECT DATE_FORMAT(m.date, '%Y-%m') as month,
+                   (SELECT COUNT(*) FROM users u
+                    WHERE u.status = '활성화' AND u.unregistered_at IS NULL AND u.registered_at <= LAST_DAY(m.date)) +
+                   (SELECT COUNT(*) FROM maker mk
+                    WHERE mk.status = '활성화' AND mk.unregistered_at IS NULL AND mk.registered_at <= LAST_DAY(m.date)) as total_active
+            FROM months m
+            ORDER BY m.date """, nativeQuery = true)
     List<Object[]> countMonthlyCurrentTotal(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     @Modifying
