@@ -13,7 +13,7 @@ public interface ProjectService {
 
     ProjectDetailResponseDTO getProjectForLive(Long id);
 
-    void createProject(ProjectRegisterRequestDTO requestDTO, List<MultipartFile> images, List<MultipartFile> documents);
+    void createProject(ProjectRegisterRequestDTO requestDTO, List<MultipartFile> images, MultipartFile contentImage, List<MultipartFile> documents);
 
     void updateProjectStatus(Long id, ProjectStatusRequestDTO requestDTO);
     

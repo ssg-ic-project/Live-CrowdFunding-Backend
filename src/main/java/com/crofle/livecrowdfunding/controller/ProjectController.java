@@ -37,8 +37,9 @@ public class ProjectController {
     public ResponseEntity<Void> createProject(
             @RequestPart ProjectRegisterRequestDTO requestDTO,
             @RequestPart(required = false) List<MultipartFile> images,
+            @RequestPart(required = false) MultipartFile contentImage,
             @RequestPart(required = false) List<MultipartFile> documents) {
-        projectService.createProject(requestDTO, images, documents);
+        projectService.createProject(requestDTO, images, contentImage, documents);
         return ResponseEntity.ok().build();
     }
 

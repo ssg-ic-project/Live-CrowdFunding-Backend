@@ -100,6 +100,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void createProject(ProjectRegisterRequestDTO requestDTO,
                               List<MultipartFile> images,
+                                MultipartFile contentImage,
                               List<MultipartFile> documents) {
         Maker maker = makerRepository.findById(requestDTO.getMakerId())
                 .orElseThrow(() -> new EntityNotFoundException("메이커 조회에 실패했습니다"));
@@ -110,7 +111,8 @@ public class ProjectServiceImpl implements ProjectService {
         RatePlan ratePlan = ratePlanRepository.findById(requestDTO.getPlanId())
                 .orElseThrow(() -> new EntityNotFoundException("요금제 조회에 실패했습니다"));
 
-        String contentImageUrl = uploadToNcp(requestDTO.getContentImage(), "content-images/");
+
+        String contentImageUrl = uploadToNcp(contentImage, "content-images/");
 
         Project project = Project.builder()
                 .maker(maker)
@@ -126,24 +128,30 @@ public class ProjectServiceImpl implements ProjectService {
 
         if (images != null) {
             for (int i = 0; i < images.size(); i++) {
+                log.info(images.get(i).getOriginalFilename());
                 String imageUrl = uploadToNcp(images.get(i), "images/");
                 project.getImages().add(Image.builder()
                         .project(project)
                         .url(imageUrl)
-                        .imageNumber(i)
+                        .imageNumber(i+1)
                         .name(images.get(i).getOriginalFilename())
                         .build());
             }
         }
 
         if (documents != null) {
+            DocumentType[] documentTypes = {DocumentType.상품정보, DocumentType.펀딩정보, DocumentType.개인정보, DocumentType.추가};
+
             for (int i = 0; i < documents.size(); i++) {
                 String documentUrl = uploadToNcp(documents.get(i), "documents/");
+                // 인덱스가 documentTypes 배열 범위를 벗어나지 않도록 보호
+                DocumentType docType = i < documentTypes.length ? documentTypes[i] : DocumentType.추가;
+
                 project.getEssentialDocuments().add(EssentialDocument.builder()
                         .project(project)
                         .url(documentUrl)
                         .name(documents.get(i).getOriginalFilename())
-                        .docType(DocumentType.valueOf(documents.get(i).getContentType()))
+                        .docType(docType)  // 파일 순서에 따라 DocumentType 지정
                         .build());
             }
         }
