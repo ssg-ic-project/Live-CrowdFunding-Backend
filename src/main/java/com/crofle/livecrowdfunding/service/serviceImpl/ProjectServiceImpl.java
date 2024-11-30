@@ -100,7 +100,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void createProject(ProjectRegisterRequestDTO requestDTO,
                               List<MultipartFile> images,
-                                MultipartFile contentImage,
+                              MultipartFile contentImage,
                               List<MultipartFile> documents) {
         Maker maker = makerRepository.findById(requestDTO.getMakerId())
                 .orElseThrow(() -> new EntityNotFoundException("메이커 조회에 실패했습니다"));
@@ -238,44 +238,62 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Transactional
     @Override
-    public void updateProject(Long id, ProjectUpdateRequestDTO requestDTO) {
+    public void updateProject(Long id,
+                              ProjectUpdateRequestDTO requestDTO,
+                              List<MultipartFile> images,
+                              MultipartFile contentImage,
+                              List<MultipartFile> documents) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("프로젝트 조회에 실패했습니다"));
 
+        // 카테고리 업데이트
         project.setCategory(categoryRepository.findById(requestDTO.getCategoryId())
                 .orElseThrow(() -> new EntityNotFoundException("카테고리 조회에 실패했습니다")));
 
-
-
+        // 기본 정보 업데이트
         project.setProductName(requestDTO.getProductName());
         project.setSummary(requestDTO.getSummary());
         project.setPrice(requestDTO.getPrice());
         project.setDiscountPercentage(requestDTO.getDiscountPercentage());
         project.setGoalAmount(requestDTO.getGoalAmount());
-        project.setContentImage(requestDTO.getContentImage());
 
-        if(requestDTO.getImages() != null) {
-            project.getImages().clear();
-            requestDTO.getImages().forEach(image -> {
-                project.getImages().add(Image.builder()
-                        .project(project)
-                        .url(image.getUrl())
-                        .imageNumber(image.getImageNumber())
-                        .name(image.getName())
-                        .build());
-            });
+        // 컨텐츠 이미지 업데이트
+        if (contentImage != null) {
+            String contentImageUrl = uploadToNcp(contentImage, "content-images/");
+            project.setContentImage(contentImageUrl);
         }
 
-        if(requestDTO.getEssentialDocuments() != null) {
+        // 이미지 목록 업데이트
+        if (images != null) {
+            project.getImages().clear();
+            for (int i = 0; i < images.size(); i++) {
+                log.info(images.get(i).getOriginalFilename());
+                String imageUrl = uploadToNcp(images.get(i), "images/");
+                project.getImages().add(Image.builder()
+                        .project(project)
+                        .url(imageUrl)
+                        .imageNumber(i+1)
+                        .name(images.get(i).getOriginalFilename())
+                        .build());
+            }
+        }
+
+        // 문서 업데이트
+        if (documents != null) {
             project.getEssentialDocuments().clear();
-            requestDTO.getEssentialDocuments().forEach(document -> {
+            DocumentType[] documentTypes = {DocumentType.상품정보, DocumentType.펀딩정보, DocumentType.개인정보, DocumentType.추가};
+
+            for (int i = 0; i < documents.size(); i++) {
+                String documentUrl = uploadToNcp(documents.get(i), "documents/");
+                DocumentType docType = i < documentTypes.length ? documentTypes[i] : DocumentType.추가;
+
                 project.getEssentialDocuments().add(EssentialDocument.builder()
                         .project(project)
-                        .name(document.getName())
-                        .url(document.getUrl())
-                        .docType(document.getDocType())
+                        .url(documentUrl)
+                        .name(documents.get(i).getOriginalFilename())
+                        .docType(docType)
                         .build());
-            });
+            }
         }
     }
 

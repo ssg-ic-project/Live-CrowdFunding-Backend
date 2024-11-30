@@ -16,7 +16,4 @@ public class ProjectUpdateRequestDTO {
     private Integer price;
     private Integer discountPercentage;
     private Integer goalAmount;
-    private String contentImage;
-    private List<ImageRegisterRequestDTO> images;
-    private List<DocumentRegisterRequestDTO> essentialDocuments;
 }
