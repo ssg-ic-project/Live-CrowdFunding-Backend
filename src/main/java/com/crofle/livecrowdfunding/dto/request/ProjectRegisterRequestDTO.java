@@ -21,5 +21,4 @@ public class ProjectRegisterRequestDTO {
     private Integer price;
     private Integer discountPercentage;
     private Integer goalAmount;
-    private MultipartFile contentImage;
 }

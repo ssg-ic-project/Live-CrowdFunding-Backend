@@ -48,7 +48,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     // 펀딩 진행 중인 프로젝트 조회 (승인 && 펀딩중)
     @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectListResponseDTO(" +
             "p.id, p.productName, p.startAt, p.progressProjectStatus, " +
-            "CAST(COALESCE(SUM(o.paymentPrice), 0) AS long), p.percentage) " +
+            "CAST(COALESCE(SUM(CASE WHEN ph IS NOT NULL THEN o.paymentPrice ELSE 0 END), 0) AS long), " +
+            "p.percentage) " +
             "FROM Project p " +
             "LEFT JOIN p.orders o " +
             "LEFT JOIN o.paymentHistory ph " +
