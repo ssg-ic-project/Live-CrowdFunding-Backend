@@ -8,6 +8,8 @@
 FROM openjdk:17-slim
 #WORKDIR /app
 
+ENV ACTIVE=dev
+
 ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} app.jar
 

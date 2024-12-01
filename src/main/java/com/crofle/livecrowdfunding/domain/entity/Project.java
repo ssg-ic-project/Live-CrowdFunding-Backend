@@ -3,6 +3,7 @@ package com.crofle.livecrowdfunding.domain.entity;
 import com.crofle.livecrowdfunding.domain.enums.ProjectStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;

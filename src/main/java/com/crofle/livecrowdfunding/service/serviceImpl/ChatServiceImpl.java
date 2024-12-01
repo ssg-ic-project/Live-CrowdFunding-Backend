@@ -17,6 +17,7 @@ public class ChatServiceImpl implements ChatService {
 
     private Trie trie;
 
+//    욕설 목록
     @Value("#{'${chat.profanity.words}'.split(',')}")
     private List<String> profanityList;
 
@@ -27,6 +28,7 @@ public class ChatServiceImpl implements ChatService {
 //                .onlyWholeWords()     // 전체 단어만 매치
                 .ignoreOverlaps()
                 .ignoreCase();        // 대소문자 무시
+//                .onlyWholeWordsWhiteSpaceSeparated(); // 화이트 스페이스로 분리한 키워드 매치
 
         // 비속어 목록 추가
 //        List<String> profanities = Arrays.asList(

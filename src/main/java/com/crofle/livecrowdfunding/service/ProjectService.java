@@ -32,4 +32,6 @@ public interface ProjectService {
     PageListResponseDTO<ProjectWithConditionResponseDTO> getCategoryProjects(Long categoryId, PageRequestDTO pageRequestDTO);
 
     PageListResponseDTO<ProjectWithConditionResponseDTO> getSearchProjects(String keyword, PageRequestDTO pageRequestDTO);
+
+    void updateStreamingStatus(Long projectId, int clickedSchedule);
 }

@@ -37,4 +37,8 @@ public class Schedule {
 
     @OneToOne(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private Script script;
+
+    public void updateStreamingStatus() {
+        this.isStreaming = !this.isStreaming;
+    }
 }
