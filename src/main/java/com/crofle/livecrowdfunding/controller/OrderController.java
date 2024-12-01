@@ -20,10 +20,10 @@ import java.net.URI;
 public class OrderController {
 
     private final OrderService orderService;
-    @PostMapping // 애초에 id만 리턴하면 되는데 우선은..
-    public ResponseEntity<Long> createOrderForPayment(@RequestBody OrderRequestDTO orderRequestDTO) {
+    @PostMapping
+    public ResponseEntity<OrderResponseDTO> createOrderForPayment(@RequestBody OrderRequestDTO orderRequestDTO) {
         OrderResponseDTO orderResponseDTO = orderService.createOrder(orderRequestDTO);
-        return ResponseEntity.ok(orderResponseDTO.getId());
+        return ResponseEntity.created(URI.create("/order/" + orderResponseDTO.getId())).body(orderResponseDTO);
     }
 
     @GetMapping("/{id}")

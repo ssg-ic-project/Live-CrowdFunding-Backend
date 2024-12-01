@@ -13,7 +13,7 @@ public interface ProjectService {
 
     ProjectDetailResponseDTO getProjectForLive(Long id);
 
-    void createProject(ProjectRegisterRequestDTO requestDTO, List<MultipartFile> images, List<MultipartFile> documents);
+    void createProject(ProjectRegisterRequestDTO requestDTO, List<MultipartFile> images, MultipartFile contentImage, List<MultipartFile> documents);
 
     void updateProjectStatus(Long id, ProjectStatusRequestDTO requestDTO);
     
@@ -21,7 +21,7 @@ public interface ProjectService {
 
     ProjectDetailToUpdateResponseDTO getProjectForManagerUpdate(Long id);
 
-    void updateProject(Long id, ProjectUpdateRequestDTO requestDTO);
+    void updateProject(Long id, ProjectUpdateRequestDTO requestDTO, List<MultipartFile> images, MultipartFile contentImage, List<MultipartFile> documents);
 
     PageListResponseDTO<ProjectListResponseDTO> getProjectList(Long id, int statusNumber, PageRequestDTO pageRequestDTO);
 
