@@ -30,6 +30,13 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Transactional
     @Override
     public void createSchedule(ScheduleRegisterRequestDTO requestDTO) {
+        // 락을 걸고 해당 시간대의 예약 수를 확인
+        int count = scheduleRepository.countByDateWithLock(requestDTO.getDate());
+
+        if (count >= 3) {
+            throw new IllegalStateException("해당 시간대는 이미 예약이 마감되었습니다.");
+        }
+
         Schedule schedule = Schedule.builder()
                 .project(projectRepository.findById(requestDTO.getProjectId()).orElseThrow())
                 .date(requestDTO.getDate())

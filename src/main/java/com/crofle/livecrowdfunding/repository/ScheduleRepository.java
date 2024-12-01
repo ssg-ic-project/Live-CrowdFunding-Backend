@@ -3,7 +3,9 @@ package com.crofle.livecrowdfunding.repository;
 import com.crofle.livecrowdfunding.domain.entity.Schedule;
 import com.crofle.livecrowdfunding.dto.response.ScheduleChartResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.YesterdayStreamingResponseDTO;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
@@ -39,4 +41,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             "WHERE s.date >= :startDate AND s.date <= :endDate AND i.imageNumber = 1 " +
             "AND s.project.id = p.id")
     List<Object[]> findScheduleChart(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT COUNT(s) FROM Schedule s WHERE s.date = :date")
+    int countByDateWithLock(LocalDateTime date);
 }
