@@ -5,6 +5,7 @@ import com.crofle.livecrowdfunding.domain.enums.ProjectStatus;
 import com.crofle.livecrowdfunding.dto.*;
 import com.crofle.livecrowdfunding.dto.request.ProjectApprovalRequestDTO;
 import com.crofle.livecrowdfunding.dto.response.EssentialDocumentDTO;
+import com.crofle.livecrowdfunding.dto.response.ImageResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.ProjectResponseInfoDTO;
 import com.crofle.livecrowdfunding.dto.request.PageRequestDTO;
 import com.crofle.livecrowdfunding.dto.response.PageListResponseDTO;
@@ -20,6 +21,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,37 +39,58 @@ public class AdminProjectServiceImpl implements AdminProjectService {
 
     @Override
     public PageListResponseDTO<ProjectResponseInfoDTO> findProjectList(PageRequestDTO pageRequestDTO) { //naming precision required
-        // 1. Create a Pageable object using the pageRequestDTO
+
+        log.info("Current Page: " + pageRequestDTO.getPage());
+        log.info("Page Size: " + pageRequestDTO.getSize());
+
         Pageable pageable = PageRequest.of(pageRequestDTO.getPage() - 1, pageRequestDTO.getSize());
 
-        // 2. Fetch a paginated result using the repository
-        //반환값을 entity 형태로 저장
-        Page<Project> projectPage = projectRepository.findAll(pageable);
+        // 검색 조건 처리
+        SearchTypeDTO searchType = pageRequestDTO.getSearch();
+        ProjectStatus reviewStatus = null;
+        ProjectStatus progressStatus = null;
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
 
-        // 3. Map the Project entities to ProjectInfoDTO objects
-        //entity 형태를 dto 형태로 response할 수 있는 형태로 변환
+        if (searchType != null) {
+            if (searchType.getRS() != null && !searchType.getRS().isEmpty()) {
+                reviewStatus = ProjectStatus.valueOf(searchType.getRS());
+            }
+            if (searchType.getPS() != null && !searchType.getPS().isEmpty()) {
+                progressStatus = ProjectStatus.valueOf(searchType.getPS());
+            }
+            if (searchType.getSD() != null && !searchType.getSD().isEmpty()) {
+                startDate = LocalDateTime.parse(searchType.getSD() + "T00:00:00");
+            }
+            if (searchType.getED() != null && !searchType.getED().isEmpty()) {
+                endDate = LocalDateTime.parse(searchType.getED() + "T23:59:59");
+            }
+        }
+
+        // 검색 쿼리 실행
+        Page<Project> projectPage = projectRepository.findBySearchConditions(
+                reviewStatus,
+                progressStatus,
+                startDate,
+                endDate,
+                pageRequestDTO.getProjectName(),
+                pageable
+        );
+
         List<ProjectResponseInfoDTO> projectResponseInfoDTOList = projectPage.stream()
-                    .map(project -> modelMapper.map(project, ProjectResponseInfoDTO.class))
-                    .collect(Collectors.toList());
+                .map(project -> modelMapper.map(project, ProjectResponseInfoDTO.class))
+                .collect(Collectors.toList());
 
-        // 4. Create PageInfoDTO from pageRequestDTO and the total count of projects
-        PageInfoDTO pageInfoDTO = PageInfoDTO.withAll().pageRequestDTO(pageRequestDTO).total((int) projectPage.getTotalElements())
+        PageInfoDTO pageInfoDTO = PageInfoDTO.withAll()
+                .pageRequestDTO(pageRequestDTO)
+                .total((int) projectPage.getTotalElements())
                 .build();
 
-        // 5. Return the response wrapped in a PageListResponseDTO
-        //여기에서 넣어줘야 하는 pageInfoDTO를 만들기 위해 위에서 build를 해준다.
-        PageListResponseDTO<ProjectResponseInfoDTO> pageListResponseDT = PageListResponseDTO.<ProjectResponseInfoDTO>builder()
+        return PageListResponseDTO.<ProjectResponseInfoDTO>builder()
                 .pageInfoDTO(pageInfoDTO)
                 .dataList(projectResponseInfoDTOList)
                 .build();
-
-        //Service 단에서 체크하는 용
-        for (ProjectResponseInfoDTO p : pageListResponseDT.getDataList()) {
-            log.info("Project ID: " + p.getId());
-            log.info("Product Name: " + p.getProductName());
-        }
-        return pageListResponseDT;
-    }
+}
 
     @Transactional(readOnly = true) //없애도 잘 동작함..와이?
     @Override
@@ -81,6 +105,17 @@ public class AdminProjectServiceImpl implements AdminProjectService {
 
     @Transactional(readOnly = true)
     @Override
+    public List<ImageResponseDTO>findProjectImages(Long id){
+        Project project = projectRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("해당 프로젝트는 존재하지 않습니다"));
+        List<ImageResponseDTO> images = project.getImages().stream()
+                .map(image ->modelMapper.map(image, ImageResponseDTO.class))
+                .collect(Collectors.toList());
+
+        return images;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
     public List<EssentialDocumentDTO> findEssentialDocs(Long id) {
         Project project = projectRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("해당 프로젝트는 존재하지 않습니다"));
 
@@ -89,14 +124,6 @@ public class AdminProjectServiceImpl implements AdminProjectService {
                 .map(doc -> modelMapper.map(doc, EssentialDocumentDTO.class))
                 .collect(Collectors.toList());
 
-         if(!project.getImages().isEmpty()) {
-             Image firstImage = project.getImages().stream()
-                     .min(Comparator.comparing(Image::getImageNumber))
-                     .orElseThrow(() -> new EntityNotFoundException("이미지를 찾을 수 없습니다"));
-             EssentialDocumentDTO imageDoc = new EssentialDocumentDTO();
-             imageDoc.setUrl(firstImage.getUrl()); //string 타입의 image가지고 오기
-             documents.add(imageDoc);
-         }
          return documents;
     }
 
