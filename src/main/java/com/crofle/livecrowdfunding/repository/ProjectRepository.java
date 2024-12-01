@@ -79,7 +79,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<ProjectListResponseDTO> findByProgressStatuses(@Param("id") Long id, @Param("statuses") List<ProjectStatus> statuses, Pageable pageable);
 
     // 메인 화면에서 라이브중인 프로젝트 조회
-    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO(p.id, s.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long)) FROM Project p " +
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO(p.id, s.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long), s.isStreaming) FROM Project p " +
             "JOIN p.schedules s LEFT JOIN p.images i " +
             "WHERE s.isStreaming = 1 AND i.imageNumber = 1 " +
             "ORDER BY s.totalViewer DESC")

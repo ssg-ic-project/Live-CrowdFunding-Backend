@@ -17,4 +17,5 @@ public class LiveFundingInMainResponseDTO {
     private Integer percentage;
     private String classification;
     private Long remainingTime;
+    private Short isStreaming;
 }
