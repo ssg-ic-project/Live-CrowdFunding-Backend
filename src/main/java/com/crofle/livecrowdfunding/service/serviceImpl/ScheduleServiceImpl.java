@@ -124,4 +124,20 @@ public class ScheduleServiceImpl implements ScheduleService {
                 })
                 .toList();
     }
+
+    @Transactional
+    @Override
+    public void updateScheduleStatus(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow();
+        switch (schedule.getIsStreaming()) {
+            case 0:
+                schedule.setIsStreaming((short) 1);
+                break;
+            case 1:
+                schedule.setIsStreaming((short) 2);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid status");
+        }
+    }
 }

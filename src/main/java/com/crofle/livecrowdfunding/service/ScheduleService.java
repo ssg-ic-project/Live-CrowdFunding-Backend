@@ -15,4 +15,6 @@ public interface ScheduleService {
     List<ScheduleReserveResponseDTO> getReserveSchedule(LocalDateTime startDateTime);
 
     List<ScheduleChartResponseDTO> getScheduleChart(LocalDateTime startDateTime);
+
+    void updateScheduleStatus(Long scheduleId);
 }

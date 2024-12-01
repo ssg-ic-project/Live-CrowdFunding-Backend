@@ -17,5 +17,5 @@ public class ProjectWithConditionResponseDTO { //검색 및 카테고리로 접�
     private Integer percentage;
     private String classification;
     private Long remainingTime;
-    private Boolean isStreaming;
+    private Short isStreaming;
 }

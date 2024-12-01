@@ -49,4 +49,13 @@ public class ScheduleServiceTest {
 
         log.info(list);
     }
+
+    @Test
+    public void updateScheduleStatusTest() {
+        Long scheduleId = 5L;
+
+        scheduleService.updateScheduleStatus(scheduleId);
+
+        log.info("Schedule status updated");
+    }
 }
