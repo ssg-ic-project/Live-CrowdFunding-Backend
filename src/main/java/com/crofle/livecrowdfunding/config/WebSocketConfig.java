@@ -43,7 +43,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private String[] getAllowedOriginsArray() {
         return allowedOrigins.split(",");
     }
-    
+
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
         registration.setSendTimeLimit(15 * 1000)

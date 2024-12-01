@@ -32,6 +32,17 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "WHERE p.id = :id")
     Optional<Project> findByIdWithDocuments(@Param("id") Long id);
 
+    @Query("SELECT DISTINCT p FROM Project p " +
+            "LEFT JOIN FETCH p.schedules s " +
+            "WHERE p.id = :id " +
+            "ORDER BY s.id DESC")
+    Optional<Project> findByIdWithSchedule(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT p FROM Project p " +
+            "LEFT JOIN FETCH p.ratePlan " +
+            "WHERE p.id = :id")
+    Optional<Project> findByIdWithRatePlan(@Param("id") Long id);
+
     // 펀딩 진행 전
     @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectListResponseDTO(" +
             "p.id, p.productName, p.startAt, p.reviewProjectStatus, " +

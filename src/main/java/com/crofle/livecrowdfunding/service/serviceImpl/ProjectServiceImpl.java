@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -195,8 +196,11 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.findByIdWithOrders(id)
                 .orElseThrow(() -> new EntityNotFoundException("프로젝트 조회에 실패했습니다"));
 
+        // 각자 조회함 -> 성능 이슈
         Project projectWithImages = projectRepository.findByIdWithImages(id).orElseThrow();
         Project projectWithDocs = projectRepository.findByIdWithDocuments(id).orElseThrow();
+        Project projectWithRatePlan = projectRepository.findByIdWithRatePlan(id).orElseThrow();
+        Project projectWithSchedule = projectRepository.findByIdWithSchedule(id).orElseThrow();
 
         ProjectDetailForMakerResponseDTO projectDetailForMakerResponseDTO = modelMapper.map(project, ProjectDetailForMakerResponseDTO.class);
         projectDetailForMakerResponseDTO.setCategory(project.getCategory().getClassification());
@@ -221,7 +225,32 @@ public class ProjectServiceImpl implements ProjectService {
                         .collect(Collectors.toList())
         );
 
+        //여기서 라이브 가능 횟수 판별 진짜 최악
+        projectDetailForMakerResponseDTO.setRemainingLiveCount(getRemainingLiveCount(projectWithRatePlan.getRatePlan()) - projectWithSchedule.getSchedules().size());
+        Optional.ofNullable(projectWithSchedule)
+                .map(p -> p.getSchedules())
+                .filter(schedules -> !schedules.isEmpty())
+                .map(schedules -> schedules.get(0))
+                .map(Schedule::getIsStreaming)
+                .ifPresentOrElse(
+                projectDetailForMakerResponseDTO::setIsStreaming,  // null이 아닐 때
+                () -> projectDetailForMakerResponseDTO.setIsStreaming((short) 3)  // null일 때
+        );
+
         return projectDetailForMakerResponseDTO;
+    }
+
+    public int getRemainingLiveCount(RatePlan ratePlan) {
+        switch (ratePlan.getId().intValue()) {
+            case 1: // 기본
+                return 0;
+            case 2: // 베이식
+                return 1;
+            case 3: //프리미엄
+                return 4;
+            default: // 안들어옴
+                return 0;
+        }
     }
 
     @Transactional(readOnly = true)
