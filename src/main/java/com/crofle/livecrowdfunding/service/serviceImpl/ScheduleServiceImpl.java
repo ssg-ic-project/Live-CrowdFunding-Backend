@@ -3,20 +3,24 @@ package com.crofle.livecrowdfunding.service.serviceImpl;
 import com.crofle.livecrowdfunding.domain.entity.Project;
 import com.crofle.livecrowdfunding.domain.entity.Schedule;
 import com.crofle.livecrowdfunding.dto.request.ScheduleRegisterRequestDTO;
+import com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.ScheduleChartResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.ScheduleReserveResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.TimeSlotResponseDTO;
 import com.crofle.livecrowdfunding.repository.ProjectRepository;
 import com.crofle.livecrowdfunding.repository.ScheduleRepository;
+import com.crofle.livecrowdfunding.service.ProjectService;
 import com.crofle.livecrowdfunding.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.cglib.core.Local;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +30,8 @@ import java.util.List;
 public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final ProjectRepository projectRepository;
+    private final ProjectService projectService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     @Override
@@ -123,5 +129,41 @@ public class ScheduleServiceImpl implements ScheduleService {
                             .build();
                 })
                 .toList();
+    }
+
+    @Transactional
+    @Override
+    public void updateScheduleStatus(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow();
+        switch (schedule.getIsStreaming()) {
+            case 0: //방송 전 -> 방송중
+                schedule.setIsStreaming((short) 1);
+                sendLiveProductUpdate(schedule);
+                break;
+            case 1: //방송중 -> 방송 종료
+                schedule.setIsStreaming((short) 2);
+                sendLiveProductUpdate(schedule);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid status");
+        }
+    }
+
+    private void sendLiveProductUpdate(Schedule schedule) {
+        Project project = schedule.getProject();
+
+        // 클라이언트에게 전송할 데이터 구성
+        LiveFundingInMainResponseDTO dto = LiveFundingInMainResponseDTO.builder()
+                .scheduleId(schedule.getId())
+                .url(project.getImages().get(0).getUrl())
+                .productName(project.getProductName())
+                .percentage(project.getPercentage())
+                .classification(project.getCategory().getClassification())
+                .remainingTime(ChronoUnit.DAYS.between(project.getStartAt(), project.getEndAt()))
+                .isStreaming(schedule.getIsStreaming())
+                .build();
+
+        // WebSocket을 통해 메시지 브로드캐스트
+        messagingTemplate.convertAndSend("/sub/live-products", dto);
     }
 }

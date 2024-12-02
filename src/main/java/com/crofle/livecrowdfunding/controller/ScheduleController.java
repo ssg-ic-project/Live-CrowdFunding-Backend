@@ -39,4 +39,10 @@ public class ScheduleController {
     public ResponseEntity<List<ScheduleChartResponseDTO>> getScheduleChart() {
         return ResponseEntity.ok().body(scheduleService.getScheduleChart(LocalDateTime.now()));
     }
+
+    @PatchMapping("/update/{scheduleId}")
+    public ResponseEntity<Void> updateScheduleStatus(@PathVariable Long scheduleId) {
+        scheduleService.updateScheduleStatus(scheduleId);
+        return ResponseEntity.ok().build();
+    }
 }
