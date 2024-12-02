@@ -31,6 +31,12 @@ public class AdminAccountServiceImpl implements AdminAccountService {
 
     @Override
     public AccountTokenResponseDTO login(AdminAccountLoginRequestDTO request) {
+//        AdminAccountView check = adminAccountRepository.checkViewExists();
+//        log.info("check view");
+//        log.info(check);
+
+        log.info("check rquest yejin");
+        log.info(request.getIdentificationNumber());
         //해당 사번의 직원이 존재하는지 DB 확인
         AdminAccountView manager = adminAccountRepository.findByIdNum(request.getIdentificationNumber())
                 .orElseThrow(()-> new IllegalArgumentException("Invalid identification number or password "));
@@ -38,6 +44,7 @@ public class AdminAccountServiceImpl implements AdminAccountService {
         log.info("사용된 PasswordEncoder 클래스: {}", passwordEncoder.getClass().getName());
         log.info("Found Manager: {}", manager);
         log.info("Input password: {}, Stored password: {}", request.getPassword(), manager.getPassword());
+
 
         //비번 확인
         boolean passwordMatch = passwordEncoder.matches(request.getPassword(), manager.getPassword());
