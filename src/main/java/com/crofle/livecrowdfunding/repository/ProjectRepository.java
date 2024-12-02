@@ -32,6 +32,17 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "WHERE p.id = :id")
     Optional<Project> findByIdWithDocuments(@Param("id") Long id);
 
+    @Query("SELECT DISTINCT p FROM Project p " +
+            "LEFT JOIN FETCH p.schedules s " +
+            "WHERE p.id = :id " +
+            "ORDER BY s.id DESC")
+    Optional<Project> findByIdWithSchedule(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT p FROM Project p " +
+            "LEFT JOIN FETCH p.ratePlan " +
+            "WHERE p.id = :id")
+    Optional<Project> findByIdWithRatePlan(@Param("id") Long id);
+
     // 펀딩 진행 전
     @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectListResponseDTO(" +
             "p.id, p.productName, p.startAt, p.reviewProjectStatus, " +
@@ -79,9 +90,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<ProjectListResponseDTO> findByProgressStatuses(@Param("id") Long id, @Param("statuses") List<ProjectStatus> statuses, Pageable pageable);
 
     // 메인 화면에서 라이브중인 프로젝트 조회
-    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO(p.id, s.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long)) FROM Project p " +
+    @Query("SELECT new com.crofle.livecrowdfunding.dto.response.LiveFundingInMainResponseDTO(p.id, s.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long), s.isStreaming) FROM Project p " +
             "JOIN p.schedules s LEFT JOIN p.images i " +
-            "WHERE s.isStreaming = true AND i.imageNumber = 1 " +
+            "WHERE s.isStreaming = 1 AND i.imageNumber = 1 " +
             "ORDER BY s.totalViewer DESC")
     List<LiveFundingInMainResponseDTO> findLiveFundingInMain();
 
@@ -93,7 +104,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     @Query("SELECT new com.crofle.livecrowdfunding.dto.response.ProjectLiveVODResponseDTO(p.id, s.id, i.url, p.productName, p.percentage, p.category.classification, CAST(DATEDIFF(p.endAt, CURRENT_DATE) AS long), s.isStreaming) FROM Project p " +
             "JOIN p.schedules s LEFT JOIN p.images i LEFT JOIN p.maker m LEFT JOIN s.video v " +
-            "WHERE i.imageNumber = 1 and p.progressProjectStatus = '펀딩중' AND (s.isStreaming = true OR v.mediaUrl IS NOT NULL )" +
+            "WHERE i.imageNumber = 1 and p.progressProjectStatus = '펀딩중' AND (s.isStreaming = 1 OR v.mediaUrl IS NOT NULL )" +
             "ORDER BY s.date DESC")
     List<ProjectLiveVODResponseDTO> findLiveAndVODProjectList();
 

@@ -2,11 +2,13 @@ package com.crofle.livecrowdfunding.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @ToString(exclude = {"video", "script"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,7 +28,7 @@ public class Schedule {
 
     @Column(name = "is_streaming", nullable = false)
     @Builder.Default
-    private Boolean isStreaming = false;
+    private short isStreaming = 0;        // 0-> 방송 전(예약) 1-> 방송 중 2-> 방송 종료
 
     @Column(name = "total_viewer", nullable = false)
     @Builder.Default

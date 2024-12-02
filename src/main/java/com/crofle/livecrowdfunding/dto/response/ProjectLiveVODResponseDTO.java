@@ -20,5 +20,5 @@ public class ProjectLiveVODResponseDTO {
     private String classification;
     private Long remainingTime;
     @JsonProperty("isStreaming")
-    private boolean isStreaming;
+    private Short isStreaming;
 }

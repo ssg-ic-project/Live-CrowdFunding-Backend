@@ -28,4 +28,6 @@ public class ProjectDetailForMakerResponseDTO { // 판매자 프로젝트 조회
     private List<DocumentResponseDTO> essentialDocuments;
     private String summary;
     private String contentImage;
+    private Integer remainingLiveCount;
+    private Short isStreaming;
 }
