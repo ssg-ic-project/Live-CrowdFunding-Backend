@@ -140,4 +140,23 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             """)
     ProjectStatisticsResponseDTO getProjectStatistics();
 
+
+    //project filtering 후 ProjectList 반환용
+    @Query("SELECT p FROM Project p WHERE " +
+            "(:RS IS NULL OR p.reviewProjectStatus = :RS) AND " +
+            "(:PS IS NULL OR p.progressProjectStatus = :PS) AND " +
+            "(:SD IS NULL OR p.startAt >= :SD) AND " +
+            "(:ED IS NULL OR p.endAt <= :ED) AND " +
+            "(:projname IS NULL OR p.productName LIKE %:projname%)")
+    Page<Project> findBySearchConditions(
+            @Param("RS") ProjectStatus reviewStatus,
+            @Param("PS") ProjectStatus progressStatus,
+            @Param("SD") LocalDateTime startDate,
+            @Param("ED") LocalDateTime endDate,
+            @Param("projname") String projectName,
+            Pageable pageable
+    );
+
+
+
 }

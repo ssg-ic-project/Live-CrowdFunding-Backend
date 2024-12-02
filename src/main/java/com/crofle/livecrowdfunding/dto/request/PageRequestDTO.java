@@ -43,7 +43,8 @@ public class PageRequestDTO {
     private Long categoryId;
 
     public int getOffset(){
-        return (page - 1) * 10;
+        return(page-1) * size;
+        //return (page - 1) * 10;
     }
 
     public Pageable getPageable() {
