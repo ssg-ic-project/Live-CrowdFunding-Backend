@@ -36,7 +36,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
             //TossPay로 결제할 경우 '간편이체'
             PaymentResponseDTO paymentResponseDTO = PaymentResponseDTO.builder()
-                    .paymentMethod("계좌이체")
+                    .paymentMethod("토스페이")
                     .orderId(Long.parseLong((String) jsonObject.get("orderId")))
                     //.orderId((String) jsonObject.get("orderId"))
                     .paymentAt(localDateTime)

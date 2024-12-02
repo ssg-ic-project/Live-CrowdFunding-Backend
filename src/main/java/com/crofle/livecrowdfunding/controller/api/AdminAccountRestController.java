@@ -21,6 +21,8 @@ public class AdminAccountRestController {
     //로그인
     @PostMapping("/login")
     public ResponseEntity<AccountTokenResponseDTO>login(@RequestBody AdminAccountLoginRequestDTO request){
+        log.info("check from controller");
+        log.info(request.getIdentificationNumber());
         return ResponseEntity.ok(adminAccountService.login(request));
     }
 

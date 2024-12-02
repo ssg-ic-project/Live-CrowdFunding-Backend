@@ -76,6 +76,8 @@ public class AdminDashboardRestController {
     @GetMapping("/dashboard/revenue-by-category")
     public ResponseEntity<CategoryRevenueResponseDTO>getCategoryRevenue(){
         List<CategoryStatsResponseDTO> categoryStats = dashBoardService.getCategoryStats();
+        log.info("checking category stats");
+        log.info(categoryStats);
 
         // 카테고리 리스트 추출
         List<String> labels = categoryStats.stream()
