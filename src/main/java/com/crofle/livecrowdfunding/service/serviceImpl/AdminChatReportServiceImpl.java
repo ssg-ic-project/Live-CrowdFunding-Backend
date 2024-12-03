@@ -109,14 +109,21 @@ public class AdminChatReportServiceImpl implements AdminChatReportService {
                     .orElseThrow(() -> new EntityNotFoundException("해당 신고 내역이 없습니다"));
             log.info("chatreport delete check");
             chatReportRepository.delete(chatReport);
-            return;
+//            return;
         }
-        //DB 업데이트
-        switch (updateDTO.getStatus()) {
-            case 활성화 -> user.activateUser();
-            case 비활성화 -> user.deactivateUser();
-            case 정지 -> user.suspendUser();
-        }
+//        //DB 업데이트
+//        switch (updateDTO.getStatus()) {
+//            case 활성화 -> user.activateUser();
+//            case 비활성화 -> user.deactivateUser();
+//            case 정지 -> user.suspendUser();
+//        }
+        // 사용자 상태 업데이트
+        user.setStatus(updateDTO.getStatus());
+        userRepository.save(user);
+        log.info("db update check: ", user);
+
+
+
         log.info("send email now");
         //이메일 전송 (사용자 이메일, 실시간 방송 이름, 직원 코멘트, 활성화일경우 1달 X사용, 정지는 평생)
         try{

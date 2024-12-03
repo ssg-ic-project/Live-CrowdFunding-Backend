@@ -152,14 +152,14 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     ProjectStatisticsResponseDTO getProjectStatistics();
 
 
-    //project filtering 후 ProjectList 반환용
-    @Query("SELECT p FROM Project p WHERE " +
-            "(:RS IS NULL OR p.reviewProjectStatus = :RS) AND " +
+    //썸네일 포함 체크
+    @Query("SELECT p, i FROM Project p LEFT JOIN Image i ON p.id = i.project.id AND i.imageNumber = 1 " +
+            "WHERE (:RS IS NULL OR p.reviewProjectStatus = :RS) AND " +
             "(:PS IS NULL OR p.progressProjectStatus = :PS) AND " +
             "(:SD IS NULL OR p.startAt >= :SD) AND " +
             "(:ED IS NULL OR p.endAt <= :ED) AND " +
-            "(:projname IS NULL OR p.productName LIKE %:projname%)")
-    Page<Project> findBySearchConditions(
+            "(:projname IS NULL OR p.productName LIKE %:projname%) order by p.id desc")
+    Page<Object[]> findProjectsWithThumbnail(
             @Param("RS") ProjectStatus reviewStatus,
             @Param("PS") ProjectStatus progressStatus,
             @Param("SD") LocalDateTime startDate,
@@ -167,5 +167,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             @Param("projname") String projectName,
             Pageable pageable
     );
+
+
+//    @Query("SELECT p, i FROM Project p LEFT JOIN Image i ON p.id = i.project.id AND i.imageNumber = 1")
+//    Page<Object[]> findProjectsWithThumbnail(Pageable pageable);
 
 }
