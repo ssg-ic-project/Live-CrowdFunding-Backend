@@ -22,7 +22,7 @@ public class MakerController {
     }
 
     //Patch로 변경 예정
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Void> updateMaker(@PathVariable Long id, @RequestBody MakerInfoRequestDTO makerInfoRequestDTO) {
         makerService.updateMaker(id, makerInfoRequestDTO);
         return ResponseEntity.ok().build();
