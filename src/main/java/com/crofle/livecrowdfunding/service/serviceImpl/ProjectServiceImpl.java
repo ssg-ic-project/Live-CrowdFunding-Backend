@@ -128,7 +128,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (images != null) {
             for (int i = 0; i < images.size(); i++) {
                 log.info(images.get(i).getOriginalFilename());
-                String imageUrl = uploadToNcp(images.get(i), "images/");
+                String imageUrl = uploadToNcp(images.get(i), "image-server/");
                 project.getImages().add(Image.builder()
                         .project(project)
                         .url(imageUrl)
@@ -216,6 +216,13 @@ public class ProjectServiceImpl implements ProjectService {
                         .map(image -> modelMapper.map(image, ImageResponseDTO.class))
                         .collect(Collectors.toList())
         );
+
+        int size = projectWithSchedule.getSchedules().size();
+        if (size != 0) {
+            projectDetailForMakerResponseDTO.setScheduleDate(projectWithSchedule.getSchedules().get(size - 1).getDate());
+            projectDetailForMakerResponseDTO.setScheduleId(projectWithSchedule.getSchedules().get(size - 1).getId());
+        }
+
 
         projectDetailForMakerResponseDTO.setEssentialDocuments(
                 projectWithDocs.getEssentialDocuments().stream()
