@@ -45,12 +45,16 @@ public class VideoService {
                 .orElseThrow(() -> new EntityNotFoundException("Schedule not found"));
 
         Video video = Video.builder()
-                .id(scheduleId)
+//                .id(scheduleId)
                 .schedule(schedule)
                 .mediaUrl(mediaUrl)
                 .build();
 
-        return videoRepository.save(video);
+        log.info(video.toString());
+
+        videoRepository.save(video);
+
+        return video;
     }
 
     private String uploadToNcp(MultipartFile file) {
