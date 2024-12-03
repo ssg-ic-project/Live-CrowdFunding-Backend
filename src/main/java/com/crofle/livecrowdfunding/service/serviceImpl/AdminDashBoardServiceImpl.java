@@ -115,6 +115,30 @@ public class AdminDashBoardServiceImpl implements AdminDashBoardService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public FundingStatusResponseDTO getSuccessRateStatus(){
+        List<Object[]> results = projectRepository.getLastMonthProjectStatus();
+        if (results.isEmpty() || results.get(0) == null) {
+            return FundingStatusResponseDTO.builder()
+                    .success(0)
+                    .failed(0)
+                    .build();
+        }
+        Object[] counts = results.get(0);
+        return FundingStatusResponseDTO.builder()
+                .success(((Long) counts[0]).intValue())
+                .failed(((Long) counts[1]).intValue())
+                .build();
+//        Object[] counts = projectRepository.getLastMonthProjectStatus();
+//        return FundingStatusResponseDTO.builder()
+//                .success(((Number)counts[0]).intValue())
+//                .failed(((Number)counts[1]).intValue())
+//                .build();
+    }
+
+
+
+
     //카테고리별 수익
     @Override
     public List<CategoryStatsResponseDTO> getCategoryStats() {

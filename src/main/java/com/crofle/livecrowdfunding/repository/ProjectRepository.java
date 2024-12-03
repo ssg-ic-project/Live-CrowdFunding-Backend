@@ -168,6 +168,15 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             Pageable pageable
     );
 
+    ////펀딩 성공 현황 그래프
+    @Query("SELECT " +
+            "COALESCE(SUM(CASE WHEN p.progressProjectStatus = '성공' THEN 1 ELSE 0 END), 0), " +
+            "COALESCE(SUM(CASE WHEN p.progressProjectStatus = '미달성' THEN 1 ELSE 0 END), 0) " +
+            "FROM Project p " +
+            "WHERE YEAR(p.endAt) = YEAR(CURRENT_DATE) " +
+            "AND MONTH(p.endAt) = MONTH(CURRENT_DATE) - 1")
+    List<Object[]> getLastMonthProjectStatus();
+
 
 //    @Query("SELECT p, i FROM Project p LEFT JOIN Image i ON p.id = i.project.id AND i.imageNumber = 1")
 //    Page<Object[]> findProjectsWithThumbnail(Pageable pageable);

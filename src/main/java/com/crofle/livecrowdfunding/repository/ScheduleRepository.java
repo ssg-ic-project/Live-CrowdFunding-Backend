@@ -18,6 +18,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             "WHERE s.date >= :startDate AND s.date <= :endDate")
     List<LocalDateTime> findByDateBetween(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
+
+    //인기 펀딩(전일)
     @Query("""
             SELECT new com.crofle.livecrowdfunding.dto.response.YesterdayStreamingResponseDTO(
                 p.productName,

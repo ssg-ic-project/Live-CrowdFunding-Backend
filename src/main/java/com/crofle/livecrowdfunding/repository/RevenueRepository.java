@@ -28,7 +28,7 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
     SELECT 
         c.classification as category_name,
         COUNT(p.id) as success_count,
-        COALESCE(ROUND(SUM(p.price * p.percentage / 100 * pl.charge / 100)), 0) as revenue
+        COALESCE(ROUND(SUM(p.goal_amount * p.percentage / 100 * pl.charge / 100)), 0) as revenue
     FROM category c
     LEFT JOIN project p ON c.id = p.category_id 
         AND p.progress_status = '성공'
