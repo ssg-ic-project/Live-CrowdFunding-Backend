@@ -1,5 +1,6 @@
 package com.crofle.livecrowdfunding.dto.request;
 
+import com.crofle.livecrowdfunding.domain.entity.Manager;
 import com.crofle.livecrowdfunding.domain.enums.ProjectStatus;
 import lombok.*;
 
@@ -11,4 +12,5 @@ import lombok.*;
 public class ProjectApprovalRequestDTO {
     private ProjectStatus status;
     private String rejectionReason;
+    private String managerId;
 }

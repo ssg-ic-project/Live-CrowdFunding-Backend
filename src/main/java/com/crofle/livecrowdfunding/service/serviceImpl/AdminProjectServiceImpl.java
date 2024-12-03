@@ -1,5 +1,6 @@
 package com.crofle.livecrowdfunding.service.serviceImpl;
 import com.crofle.livecrowdfunding.domain.entity.Image;
+import com.crofle.livecrowdfunding.domain.entity.Manager;
 import com.crofle.livecrowdfunding.domain.entity.Project;
 import com.crofle.livecrowdfunding.domain.enums.ProjectStatus;
 import com.crofle.livecrowdfunding.dto.*;
@@ -9,6 +10,7 @@ import com.crofle.livecrowdfunding.dto.response.ImageResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.ProjectResponseInfoDTO;
 import com.crofle.livecrowdfunding.dto.request.PageRequestDTO;
 import com.crofle.livecrowdfunding.dto.response.PageListResponseDTO;
+import com.crofle.livecrowdfunding.repository.ManagerRepository;
 import com.crofle.livecrowdfunding.repository.ProjectRepository;
 import com.crofle.livecrowdfunding.service.AdminProjectService;
 import jakarta.persistence.EntityNotFoundException;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminProjectServiceImpl implements AdminProjectService {
     private final ProjectRepository projectRepository;
+    private final ManagerRepository managerRepository;
     private final ModelMapper modelMapper;
 
     @Autowired
@@ -98,7 +101,6 @@ public class AdminProjectServiceImpl implements AdminProjectService {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("프로젝트 조회에 실패했습니다"));
 
-        log.info("check1: ", project.getManager().getId());
         ProjectResponseInfoDTO projectResponseInfoDTO = modelMapper.map(project, ProjectResponseInfoDTO.class);
         return projectResponseInfoDTO;
     }
@@ -134,8 +136,21 @@ public class AdminProjectServiceImpl implements AdminProjectService {
         //1. 프로젝트 존재 유무 확인
         Project project = projectRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("해당 프로젝트는 존재하지 않습니다"));
 
+        Manager manager = managerRepository.findManager(request.getManagerId()).orElseThrow(()-> new EntityNotFoundException("존재하지 않는 Manager 입니다"));
+
+        //1.5. manager 저장하기
+        project.setManager(manager);
+        log.info("yejin from manager");
+        log.info(request.getManagerId());
+
+        //trigger과 충돌땜에 여기에 구현
+        project.setStartAt(LocalDateTime.now());
+        project.setEndAt(LocalDateTime.now().plusMonths(1));
+
         //2. 상태 업데이트
         project.setReviewProjectStatus(request.getStatus());
+
+        project.setProgressProjectStatus(ProjectStatus.펀딩중);
 
         //3. 반려인 경우 사유 저장
         if(request.getStatus() == ProjectStatus.반려){

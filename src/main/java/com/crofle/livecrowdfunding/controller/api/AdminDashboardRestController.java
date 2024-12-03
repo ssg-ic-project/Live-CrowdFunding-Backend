@@ -77,7 +77,12 @@ public class AdminDashboardRestController {
     public ResponseEntity<CategoryRevenueResponseDTO>getCategoryRevenue(){
         List<CategoryStatsResponseDTO> categoryStats = dashBoardService.getCategoryStats();
         log.info("checking category stats");
-        log.info(categoryStats);
+        categoryStats.forEach(stat -> {
+            log.info("Category: " + stat.getCategory());
+            log.info("revenue: " + stat.getRevenue());
+            log.info("success count: " + stat.getSuccessCount());
+            log.info("------------------------");
+        });
 
         // 카테고리 리스트 추출
         List<String> labels = categoryStats.stream()
