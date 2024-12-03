@@ -44,13 +44,17 @@ public class VideoService {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new EntityNotFoundException("Schedule not found"));
 
-        Video video = Video.builder()
-//                .id(scheduleId)
-                .schedule(schedule)
-                .mediaUrl(mediaUrl)
-                .build();
+        Video video = null;
 
-        log.info(video.toString());
+        try {
+            video = videoRepository.findById(scheduleId).orElseThrow(() -> new EntityNotFoundException("Video not found"));
+        } catch (EntityNotFoundException e) {
+            video = Video.builder()
+//                .id(scheduleId)
+                    .schedule(schedule)
+                    .mediaUrl(mediaUrl)
+                    .build();
+        }
 
         videoRepository.save(video);
 
