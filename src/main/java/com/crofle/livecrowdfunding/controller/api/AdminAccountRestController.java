@@ -23,6 +23,7 @@ public class AdminAccountRestController {
     public ResponseEntity<AccountTokenResponseDTO>login(@RequestBody AdminAccountLoginRequestDTO request){
         log.info("check from controller");
         log.info(request.getIdentificationNumber());
+        log.info(request.getPassword());
         return ResponseEntity.ok(adminAccountService.login(request));
     }
 

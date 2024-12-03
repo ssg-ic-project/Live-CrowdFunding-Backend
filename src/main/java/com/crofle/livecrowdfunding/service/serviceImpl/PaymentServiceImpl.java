@@ -34,7 +34,7 @@ public class PaymentServiceImpl implements PaymentService {
                 log.error("날짜 파싱 실패: " + dateStr);
                 throw new IllegalArgumentException("잘못된 날짜 형식입니다.", e);
             }
-            //TossPay로 결제할 경우 '간편이체'
+            //TossPay로 결제할 경우 '토스페이'
             PaymentResponseDTO paymentResponseDTO = PaymentResponseDTO.builder()
                     .paymentMethod("토스페이")
                     .orderId(Long.parseLong((String) jsonObject.get("orderId")))

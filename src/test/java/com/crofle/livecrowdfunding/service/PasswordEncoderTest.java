@@ -15,7 +15,7 @@ public class PasswordEncoderTest {
 
     @Test
     void encodePassword(){
-        String rawPassword = "AdminPass!23";
+        String rawPassword = "M001";
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
         System.out.println("Encoded password: " + encodedPassword);
