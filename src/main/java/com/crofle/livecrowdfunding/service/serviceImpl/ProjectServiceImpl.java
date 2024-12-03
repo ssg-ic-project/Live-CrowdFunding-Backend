@@ -15,10 +15,7 @@ import com.crofle.livecrowdfunding.domain.enums.ProjectStatus;
 import com.crofle.livecrowdfunding.dto.PageInfoDTO;
 import com.crofle.livecrowdfunding.dto.request.*;
 import com.crofle.livecrowdfunding.dto.response.*;
-import com.crofle.livecrowdfunding.repository.CategoryRepository;
-import com.crofle.livecrowdfunding.repository.MakerRepository;
-import com.crofle.livecrowdfunding.repository.ProjectRepository;
-import com.crofle.livecrowdfunding.repository.RatePlanRepository;
+import com.crofle.livecrowdfunding.repository.*;
 import com.crofle.livecrowdfunding.service.ProjectService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +40,7 @@ import java.util.stream.Collectors;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final ScheduleRepository scheduleRepository;
     private final MakerRepository makerRepository;
     private final RatePlanRepository ratePlanRepository;
     private final CategoryRepository categoryRepository;
@@ -414,5 +412,27 @@ public class ProjectServiceImpl implements ProjectService {
                         .total((int) projects.getTotalElements())
                         .build())
                 .build();
+    }
+
+    @Transactional
+    public void updateStreamingStatus(Long projectId, int clickedSchedule) {
+        try {
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + projectId));
+
+            if (clickedSchedule >= project.getSchedules().size()) {
+                throw new IllegalArgumentException("Invalid schedule index: " + clickedSchedule);
+            }
+
+            log.info(project.getSchedules());
+
+            Schedule schedule = project.getSchedules().get(clickedSchedule);
+            schedule.updateStreamingStatus();
+            scheduleRepository.save(schedule);
+
+        } catch (Exception e) {
+            log.error("Error updating streaming status: {}", e.getMessage());
+            throw new RuntimeException("Failed to update streaming status", e);
+        }
     }
 }

@@ -84,4 +84,11 @@ public class VideoService {
             throw new RuntimeException("AWS SDK client error", e);
         }
     }
+
+    public String getMediaUrl(Long scheduleId) {
+        Video video = videoRepository.findById(scheduleId).orElseThrow();
+
+        String mediaUrl = video.getMediaUrl();
+        return mediaUrl;
+    }
 }

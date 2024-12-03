@@ -1,21 +1,33 @@
 package com.crofle.livecrowdfunding.service;
 
+import com.crofle.livecrowdfunding.domain.entity.Project;
+import com.crofle.livecrowdfunding.domain.entity.Schedule;
 import com.crofle.livecrowdfunding.domain.enums.DocumentType;
 import com.crofle.livecrowdfunding.domain.enums.ProjectStatus;
 import com.crofle.livecrowdfunding.dto.request.*;
 import com.crofle.livecrowdfunding.dto.response.*;
+import com.crofle.livecrowdfunding.repository.ProjectRepository;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest
 @Log4j2
+@ActiveProfiles("local")
 public class ProjectServiceTest {
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     @Test
     public void testFindProjectDetail() {
@@ -163,5 +175,29 @@ public class ProjectServiceTest {
         String keyword = "싸디";
         PageListResponseDTO<ProjectWithConditionResponseDTO> dto = projectService.getSearchProjects(keyword, PageRequestDTO.builder().page(1).size(2).build());
         log.info(dto);
+    }
+
+    @Test
+    @DisplayName("스트리밍 상태 변경 테스트")
+    @Transactional
+    public void updateStreamingStatusTest() {
+        // given
+        Long projectId = 3L;
+        int index = 0;
+        Boolean status = true;
+
+        // when
+
+        projectService.updateStreamingStatus(projectId, index);
+        Project project = projectRepository.findById(projectId).orElseThrow();
+        Schedule schedule = project.getSchedules().get(index);
+
+        log.info(schedule);
+
+        log.info(schedule.getIsStreaming());
+
+        // then
+        assertThat(schedule.getIsStreaming())
+                .isTrue();
     }
 }
