@@ -154,14 +154,14 @@ public class ProjectController {
         return null;
     }
 
-    @PatchMapping("/streaming-status")
-    public ResponseEntity<String> updateStatue(@RequestBody StreamingStatusRequestDTO request) {
-        projectService.updateStreamingStatus(request.getProjectId(), request.getIndex());
-
-        String message = "방송 상태가 변경되었습니다.";
-
-        return ResponseEntity.ok(message);
-    }
+//    @PatchMapping("/streaming-status")
+//    public ResponseEntity<String> updateStatue(@RequestBody StreamingStatusRequestDTO request) {
+//        projectService.updateStreamingStatus(request.getProjectId(), request.getIndex());
+//
+//        String message = "방송 상태가 변경되었습니다.";
+//
+//        return ResponseEntity.ok(message);
+//    }
 
 }
 

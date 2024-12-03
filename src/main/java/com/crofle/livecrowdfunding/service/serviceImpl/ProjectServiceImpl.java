@@ -414,25 +414,25 @@ public class ProjectServiceImpl implements ProjectService {
                 .build();
     }
 
-    @Transactional
-    public void updateStreamingStatus(Long projectId, int clickedSchedule) {
-        try {
-            Project project = projectRepository.findById(projectId)
-                    .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + projectId));
-
-            if (clickedSchedule >= project.getSchedules().size()) {
-                throw new IllegalArgumentException("Invalid schedule index: " + clickedSchedule);
-            }
-
-            log.info(project.getSchedules());
-
-            Schedule schedule = project.getSchedules().get(clickedSchedule);
-            schedule.updateStreamingStatus();
-            scheduleRepository.save(schedule);
-
-        } catch (Exception e) {
-            log.error("Error updating streaming status: {}", e.getMessage());
-            throw new RuntimeException("Failed to update streaming status", e);
-        }
-    }
+//    @Transactional
+//    public void updateStreamingStatus(Long projectId, int clickedSchedule) {
+//        try {
+//            Project project = projectRepository.findById(projectId)
+//                    .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + projectId));
+//
+//            if (clickedSchedule >= project.getSchedules().size()) {
+//                throw new IllegalArgumentException("Invalid schedule index: " + clickedSchedule);
+//            }
+//
+//            log.info(project.getSchedules());
+//
+//            Schedule schedule = project.getSchedules().get(clickedSchedule);
+//            schedule.updateStreamingStatus();
+//            scheduleRepository.save(schedule);
+//
+//        } catch (Exception e) {
+//            log.error("Error updating streaming status: {}", e.getMessage());
+//            throw new RuntimeException("Failed to update streaming status", e);
+//        }
+//    }
 }

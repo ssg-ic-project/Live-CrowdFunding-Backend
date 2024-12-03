@@ -177,27 +177,27 @@ public class ProjectServiceTest {
         log.info(dto);
     }
 
-    @Test
-    @DisplayName("스트리밍 상태 변경 테스트")
-    @Transactional
-    public void updateStreamingStatusTest() {
-        // given
-        Long projectId = 3L;
-        int index = 0;
-        Boolean status = true;
-
-        // when
-
-        projectService.updateStreamingStatus(projectId, index);
-        Project project = projectRepository.findById(projectId).orElseThrow();
-        Schedule schedule = project.getSchedules().get(index);
-
-        log.info(schedule);
-
-        log.info(schedule.getIsStreaming());
-
-        // then
-        assertThat(schedule.getIsStreaming())
-                .isTrue();
-    }
+//    @Test
+//    @DisplayName("스트리밍 상태 변경 테스트")
+//    @Transactional
+//    public void updateStreamingStatusTest() {
+//        // given
+//        Long projectId = 3L;
+//        int index = 0;
+//        Boolean status = true;
+//
+//        // when
+//
+//        projectService.updateStreamingStatus(projectId, index);
+//        Project project = projectRepository.findById(projectId).orElseThrow();
+//        Schedule schedule = project.getSchedules().get(index);
+//
+//        log.info(schedule);
+//
+//        log.info(schedule.getIsStreaming());
+//
+//        // then
+//        assertThat(schedule.getIsStreaming())
+//                .isTrue();
+//    }
 }
