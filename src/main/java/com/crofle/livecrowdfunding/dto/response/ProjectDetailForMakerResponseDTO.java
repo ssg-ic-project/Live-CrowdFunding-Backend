@@ -30,4 +30,6 @@ public class ProjectDetailForMakerResponseDTO { // 판매자 프로젝트 조회
     private String contentImage;
     private Integer remainingLiveCount;
     private Short isStreaming;
+    private Long scheduleId;
+    private LocalDateTime scheduleDate;
 }

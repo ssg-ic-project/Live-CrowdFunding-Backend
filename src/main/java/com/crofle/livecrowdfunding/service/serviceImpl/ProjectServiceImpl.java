@@ -217,6 +217,13 @@ public class ProjectServiceImpl implements ProjectService {
                         .collect(Collectors.toList())
         );
 
+        int size = projectWithSchedule.getSchedules().size();
+        if (size != 0) {
+            projectDetailForMakerResponseDTO.setScheduleDate(projectWithSchedule.getSchedules().get(size - 1).getDate());
+            projectDetailForMakerResponseDTO.setScheduleId(projectWithSchedule.getSchedules().get(size - 1).getId());
+        }
+
+
         projectDetailForMakerResponseDTO.setEssentialDocuments(
                 projectWithDocs.getEssentialDocuments().stream()
                         .map(document -> modelMapper.map(document, DocumentResponseDTO.class))
