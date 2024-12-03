@@ -85,6 +85,11 @@ public class ProjectController {
         return ResponseEntity.ok(projectService.getLiveAndVODProjectList());
     }
 
+    @GetMapping("/vod")
+    public ResponseEntity<List<ProjectVodResponseDTO>> getVodProjects() {
+        return ResponseEntity.ok(projectService.findVodProjects());
+    }
+
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<PageListResponseDTO<ProjectWithConditionResponseDTO>> getCategoryProjects(@PathVariable Long categoryId, @ModelAttribute PageRequestDTO pageRequestDTO) {
         return ResponseEntity.ok(projectService.getCategoryProjects(categoryId, pageRequestDTO));

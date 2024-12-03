@@ -42,6 +42,14 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             "AND s.project.id = p.id")
     List<Object[]> findScheduleChart(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
+    @Query("SELECT s FROM Schedule s " +
+            "JOIN FETCH s.project p " +
+            "JOIN FETCH s.video v " +
+            "WHERE s.isStreaming = 2 " +
+            "AND v.mediaUrl IS NOT NULL " +
+            "AND v.mediaUrl != ''")  // 방송이 종료된 스케줄만 조회
+    List<Schedule> findVodSchedules();
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT COUNT(s) FROM Schedule s WHERE s.date = :date")
     int countByDateWithLock(LocalDateTime date);
