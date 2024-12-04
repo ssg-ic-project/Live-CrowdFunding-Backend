@@ -12,6 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "USERS")
 @Getter
+@Setter
 @Builder
 @ToString(exclude = {"interests", "likes", "orders", "chatReports"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

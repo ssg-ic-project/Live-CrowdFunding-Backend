@@ -70,8 +70,7 @@ public class AdminProjectServiceImpl implements AdminProjectService {
             }
         }
 
-        // 검색 쿼리 실행
-        Page<Project> projectPage = projectRepository.findBySearchConditions(
+        Page<Object[]> projectsWithThumbnail = projectRepository.findProjectsWithThumbnail(
                 reviewStatus,
                 progressStatus,
                 startDate,
@@ -80,13 +79,22 @@ public class AdminProjectServiceImpl implements AdminProjectService {
                 pageable
         );
 
-        List<ProjectResponseInfoDTO> projectResponseInfoDTOList = projectPage.stream()
-                .map(project -> modelMapper.map(project, ProjectResponseInfoDTO.class))
-                .collect(Collectors.toList());
+        //썸네일도 같이 보내주기
+        List<ProjectResponseInfoDTO> projectResponseInfoDTOList = projectsWithThumbnail.map(result -> {
+            Project project = (Project) result[0];
+            Image image = (Image) result[1];
+
+            ProjectResponseInfoDTO dto = modelMapper.map(project, ProjectResponseInfoDTO.class);
+            if (image != null) {
+                dto.setThumbNailImageUrl(image.getUrl());
+            }
+            return dto;
+        }).getContent();
+
 
         PageInfoDTO pageInfoDTO = PageInfoDTO.withAll()
                 .pageRequestDTO(pageRequestDTO)
-                .total((int) projectPage.getTotalElements())
+                .total((int) projectsWithThumbnail.getTotalElements())
                 .build();
 
         return PageListResponseDTO.<ProjectResponseInfoDTO>builder()

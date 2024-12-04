@@ -45,6 +45,14 @@ public class AdminDashboardRestController {
         return ResponseEntity.ok(userStats);
     }
 
+    @GetMapping("/dashboard/projectSuccessRate")
+    public ResponseEntity<FundingStatusResponseDTO>getSuccessRate(){
+        log.info("inside controller successrate check");
+        FundingStatusResponseDTO dto = dashBoardService.getSuccessRateStatus();
+        return ResponseEntity.ok(dto);
+    }
+
+
     @GetMapping("/dashboard/yearly-revenue")
     public ResponseEntity<RevenueGraphResponseDTO>getTotalRevenue(){
         RevenueGraphResponseDTO revenueStats = RevenueGraphResponseDTO.builder()

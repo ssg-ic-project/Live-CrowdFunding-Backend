@@ -152,14 +152,14 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     ProjectStatisticsResponseDTO getProjectStatistics();
 
 
-    //project filtering 후 ProjectList 반환용
-    @Query("SELECT p FROM Project p WHERE " +
-            "(:RS IS NULL OR p.reviewProjectStatus = :RS) AND " +
+    //썸네일 포함 체크
+    @Query("SELECT p, i FROM Project p LEFT JOIN Image i ON p.id = i.project.id AND i.imageNumber = 1 " +
+            "WHERE (:RS IS NULL OR p.reviewProjectStatus = :RS) AND " +
             "(:PS IS NULL OR p.progressProjectStatus = :PS) AND " +
             "(:SD IS NULL OR p.startAt >= :SD) AND " +
             "(:ED IS NULL OR p.endAt <= :ED) AND " +
-            "(:projname IS NULL OR p.productName LIKE %:projname%)")
-    Page<Project> findBySearchConditions(
+            "(:projname IS NULL OR p.productName LIKE %:projname%) order by p.id desc")
+    Page<Object[]> findProjectsWithThumbnail(
             @Param("RS") ProjectStatus reviewStatus,
             @Param("PS") ProjectStatus progressStatus,
             @Param("SD") LocalDateTime startDate,
@@ -167,5 +167,18 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             @Param("projname") String projectName,
             Pageable pageable
     );
+
+    ////펀딩 성공 현황 그래프
+    @Query("SELECT " +
+            "COALESCE(SUM(CASE WHEN p.progressProjectStatus = '성공' THEN 1 ELSE 0 END), 0), " +
+            "COALESCE(SUM(CASE WHEN p.progressProjectStatus = '미달성' THEN 1 ELSE 0 END), 0) " +
+            "FROM Project p " +
+            "WHERE YEAR(p.endAt) = YEAR(CURRENT_DATE) " +
+            "AND MONTH(p.endAt) = MONTH(CURRENT_DATE) - 1")
+    List<Object[]> getLastMonthProjectStatus();
+
+
+//    @Query("SELECT p, i FROM Project p LEFT JOIN Image i ON p.id = i.project.id AND i.imageNumber = 1")
+//    Page<Object[]> findProjectsWithThumbnail(Pageable pageable);
 
 }

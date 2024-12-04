@@ -33,6 +33,7 @@ public class ProjectResponseInfoDTO {
     private ProjectStatus progressProjectStatus;
     private Integer goalAmount; //조회시 필요없음
     private String contentImage;
+    private String thumbNailImageUrl;
 
 //    //승인, 반려를 위해 확인해야하는 docs
 //    private List<EssentialDocumentDTO> documents;
