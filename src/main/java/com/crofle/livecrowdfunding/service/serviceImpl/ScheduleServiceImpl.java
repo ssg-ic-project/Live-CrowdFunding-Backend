@@ -144,6 +144,10 @@ public class ScheduleServiceImpl implements ScheduleService {
                 schedule.setIsStreaming((short) 2);
                 sendLiveProductUpdate(schedule);
                 break;
+            case 2://방송 종료-> 다시 방송
+                schedule.setIsStreaming((short) 1);
+                sendLiveProductUpdate(schedule);
+                break;
             default:
                 throw new IllegalArgumentException("Invalid status");
         }
