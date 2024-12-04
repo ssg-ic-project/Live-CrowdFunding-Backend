@@ -386,6 +386,18 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.findLiveAndVODProjectList();
     }
 
+    public List<ProjectVodResponseDTO> findVodProjects() {
+        List<Schedule> vodSchedules = scheduleRepository.findVodSchedules();
+        return vodSchedules.stream()
+                .map(this::convertToVodResponse)
+                .collect(Collectors.toList());
+    }
+
+    private ProjectVodResponseDTO convertToVodResponse(Schedule schedule) {
+        Project project = schedule.getProject();
+        return ProjectVodResponseDTO.from(project, schedule);
+    }
+
     @Override
     public PageListResponseDTO<ProjectWithConditionResponseDTO> getCategoryProjects(Long categoryId, PageRequestDTO pageRequestDTO) {
         Page<ProjectWithConditionResponseDTO> projectPage = projectRepository.findByCategoryIdProject(categoryId, pageRequestDTO.getPageable());

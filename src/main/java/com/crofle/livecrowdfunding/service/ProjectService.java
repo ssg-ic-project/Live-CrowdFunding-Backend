@@ -33,5 +33,7 @@ public interface ProjectService {
 
     PageListResponseDTO<ProjectWithConditionResponseDTO> getSearchProjects(String keyword, PageRequestDTO pageRequestDTO);
 
+    List<ProjectVodResponseDTO> findVodProjects();
+
 //    void updateStreamingStatus(Long projectId, int clickedSchedule);
 }
