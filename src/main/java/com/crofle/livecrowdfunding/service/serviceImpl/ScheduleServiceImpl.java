@@ -158,6 +158,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         // 클라이언트에게 전송할 데이터 구성
         LiveFundingInMainResponseDTO dto = LiveFundingInMainResponseDTO.builder()
+                .id(project.getId())
                 .scheduleId(schedule.getId())
                 .url(project.getImages().get(0).getUrl())
                 .productName(project.getProductName())
