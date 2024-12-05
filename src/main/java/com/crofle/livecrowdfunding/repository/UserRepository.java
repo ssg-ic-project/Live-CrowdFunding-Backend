@@ -33,9 +33,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     //가입 현황 그래프 용
     //Users
     @Query(value = """
-            
+
                     SELECT DATE_FORMAT(registered_at, '%Y-%m') as month, COUNT(*) as count
-            FROM users WHERE registered_at >= :startDate AND registered_at < :endDate 
+            FROM users WHERE registered_at >= :startDate AND registered_at < :endDate
             GROUP BY DATE_FORMAT(registered_at, '%Y-%m') ORDER BY month """, nativeQuery = true)
     List<Object[]> countMonthlyNewUsers(@Param("startDate") LocalDateTime startDate,
                                         @Param("endDate") LocalDateTime endDate);
@@ -43,7 +43,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     //Maker
     @Query(value = """
             SELECT DATE_FORMAT(registered_at, '%Y-%m') as month, COUNT(*) as count
-            FROM maker WHERE registered_at >= :startDate AND registered_at < :endDate 
+            FROM maker WHERE registered_at >= :startDate AND registered_at < :endDate
             GROUP BY DATE_FORMAT(registered_at, '%Y-%m') ORDER BY month """, nativeQuery = true)
     List<Object[]> countMonthlyNewMakers(@Param("startDate") LocalDateTime startDate,
                                          @Param("endDate") LocalDateTime endDate);
@@ -59,20 +59,55 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     //이용자 현황 그래프 용
     //Users
+    //Users
     @Query(value = """
-            SELECT DATE_FORMAT(registered_at, '%Y-%m') as month,
-            COUNT(*) as count FROM users WHERE status = '활성화' AND unregistered_at IS NULL
-            GROUP BY DATE_FORMAT(registered_at, '%Y-%m') HAVING month >= DATE_FORMAT(:startDate, '%Y-%m') 
-            AND month <= DATE_FORMAT(:endDate, '%Y-%m') ORDER BY month """, nativeQuery = true)
+        WITH RECURSIVE months AS (
+            SELECT :startDate as date
+            UNION ALL
+            SELECT DATE_ADD(date, INTERVAL 1 MONTH) as date
+            FROM months
+            WHERE date < :endDate
+        )
+        SELECT DATE_FORMAT(m.date, '%Y-%m') as month,
+               (SELECT COUNT(*) FROM users u
+                WHERE u.status = '활성화' AND u.unregistered_at IS NULL 
+                AND u.registered_at <= LAST_DAY(m.date)) as count
+        FROM months m
+        ORDER BY m.date """, nativeQuery = true)
     List<Object[]> countMonthlyCurrentUsers(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
-    //Maker
+    //Makers
     @Query(value = """
-            SELECT DATE_FORMAT(registered_at, '%Y-%m') as month,
-            COUNT(*) as count FROM maker WHERE status = '활성화' AND unregistered_at IS NULL
-            GROUP BY DATE_FORMAT(registered_at, '%Y-%m') HAVING month >= DATE_FORMAT(:startDate, '%Y-%m') 
-            AND month <= DATE_FORMAT(:endDate, '%Y-%m') ORDER BY month """, nativeQuery = true)
+        WITH RECURSIVE months AS (
+            SELECT :startDate as date
+            UNION ALL
+            SELECT DATE_ADD(date, INTERVAL 1 MONTH) as date
+            FROM months
+            WHERE date < :endDate
+        )
+        SELECT DATE_FORMAT(m.date, '%Y-%m') as month,
+               (SELECT COUNT(*) FROM maker mk
+                WHERE mk.status = '활성화' AND mk.unregistered_at IS NULL 
+                AND mk.registered_at <= LAST_DAY(m.date)) as count
+        FROM months m
+        ORDER BY m.date """, nativeQuery = true)
     List<Object[]> countMonthlyCurrentMakers(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+
+//    @Query(value = """
+//            SELECT DATE_FORMAT(registered_at, '%Y-%m') as month,
+//            COUNT(*) as count FROM users WHERE status = '활성화' AND unregistered_at IS NULL
+//            GROUP BY DATE_FORMAT(registered_at, '%Y-%m') HAVING month >= DATE_FORMAT(:startDate, '%Y-%m')
+//            AND month <= DATE_FORMAT(:endDate, '%Y-%m') ORDER BY month """, nativeQuery = true)
+//    List<Object[]> countMonthlyCurrentUsers(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+//
+//    //Maker
+//    @Query(value = """
+//            SELECT DATE_FORMAT(registered_at, '%Y-%m') as month,
+//            COUNT(*) as count FROM maker WHERE status = '활성화' AND unregistered_at IS NULL
+//            GROUP BY DATE_FORMAT(registered_at, '%Y-%m') HAVING month >= DATE_FORMAT(:startDate, '%Y-%m')
+//            AND month <= DATE_FORMAT(:endDate, '%Y-%m') ORDER BY month """, nativeQuery = true)
+//    List<Object[]> countMonthlyCurrentMakers(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     //Total. 재귀쿼리사용하기
     @Query(value = """
