@@ -80,6 +80,15 @@ public class ProjectServiceImpl implements ProjectService {
         projectDetailWithLikedResponseDTO.setLikeCount(project.getLikes().size());
         projectDetailWithLikedResponseDTO.setIsLiked(project.getLikes().stream()
                 .anyMatch(like -> like.getUser().getId().equals(userId)));
+        //isStreaming은 short 타입이고 schedule_id가 가장 큰 것을 가져옴
+        projectDetailWithLikedResponseDTO.setIsStreaming(project.getSchedules().stream()
+                .max((s1, s2) -> s1.getId().compareTo(s2.getId()))
+                .map(Schedule::getIsStreaming)
+                .orElse((short) 3));
+        projectDetailWithLikedResponseDTO.setScheduleId(project.getSchedules().stream()
+                .max((s1, s2) -> s1.getId().compareTo(s2.getId()))
+                .map(Schedule::getId)
+                .orElse(null));
 
         return projectDetailWithLikedResponseDTO;
     }

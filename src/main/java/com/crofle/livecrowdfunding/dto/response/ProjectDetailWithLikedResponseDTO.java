@@ -25,4 +25,6 @@ public class ProjectDetailWithLikedResponseDTO { // 사용자가 프로젝트 �
     private List<ImageResponseDTO> images;
     private Integer likeCount;
     private Boolean isLiked;
+    private Short isStreaming;
+    private Long scheduleId;
 }
