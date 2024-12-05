@@ -18,7 +18,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class AdminDashboardRestController {
     LocalDateTime now = LocalDateTime.now();
-    LocalDateTime oneYearAgo = now.minusYears(1);
+//    LocalDateTime oneYearAgo = now.minusYears(1);
+    LocalDateTime oneYearAgo = now.minusMonths(13).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+//
+
+
 
     //프론트에서 Fetchall 사용해 개별 엔드포인트 병렬 호출
     public final AdminDashBoardService dashBoardService;
@@ -42,6 +46,7 @@ public class AdminDashboardRestController {
                 .build();
         log.info("checking for makers");
         log.info(userStats.getMakers());
+        log.info(userStats.getLabels());
         return ResponseEntity.ok(userStats);
     }
 

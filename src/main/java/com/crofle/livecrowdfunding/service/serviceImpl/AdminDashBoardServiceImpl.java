@@ -28,7 +28,7 @@ public class AdminDashBoardServiceImpl implements AdminDashBoardService {
     //최근 12개월 list
     @Override
     public List<String> getLast12Months(){
-        return Stream.iterate(LocalDate.now().minusMonths(11),
+        return Stream.iterate(LocalDate.now().minusMonths(12),
                 date->date.plusMonths(1))
                 .limit(12)
                 .map(date->date.format(DateTimeFormatter.ofPattern("yyyy-MM")))
