@@ -20,4 +20,9 @@ public class Video {
 
     @Column(name = "media_url", nullable = false, length = 255)
     private String mediaUrl;
+
+    // 미디어 URL 업데이트 메서드 추가
+    public void updateMediaUrl(String mediaUrl) {
+        this.mediaUrl = mediaUrl;
+    }
 }
