@@ -48,6 +48,8 @@ public class VideoService {
 
         try {
             video = videoRepository.findById(scheduleId).orElseThrow(() -> new EntityNotFoundException("Video not found"));
+
+            video.updateMediaUrl(mediaUrl);
         } catch (EntityNotFoundException e) {
             video = Video.builder()
 //                .id(scheduleId)
