@@ -1,5 +1,6 @@
 package com.crofle.livecrowdfunding.repository;
 
+import com.amazonaws.services.s3.transfer.Copy;
 import com.crofle.livecrowdfunding.domain.entity.Schedule;
 import com.crofle.livecrowdfunding.dto.response.ScheduleChartResponseDTO;
 import com.crofle.livecrowdfunding.dto.response.YesterdayStreamingResponseDTO;
@@ -53,6 +54,10 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findVodSchedules();
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT s FROM Schedule s WHERE s.date = :date")
+    List<Schedule> findAllByDateWithLock(LocalDateTime date);
+
     @Query("SELECT COUNT(s) FROM Schedule s WHERE s.date = :date")
-    int countByDateWithLock(LocalDateTime date);
+    int countByDate(LocalDateTime date);
+
 }

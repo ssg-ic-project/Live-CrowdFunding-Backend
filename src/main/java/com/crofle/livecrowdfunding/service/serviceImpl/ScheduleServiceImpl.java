@@ -16,6 +16,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.cglib.core.Local;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -36,17 +37,21 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Transactional
     @Override
     public void createSchedule(ScheduleRegisterRequestDTO requestDTO) {
-        // 락을 걸고 해당 시간대의 예약 수를 확인
-        int count = scheduleRepository.countByDateWithLock(requestDTO.getDate());
 
-        if (count >= 3) {
+        List<Schedule> schedules = scheduleRepository.findAllByDateWithLock(requestDTO.getDate());
+
+        if (schedules.size() >= 15) {
             throw new IllegalStateException("해당 시간대는 이미 예약이 마감되었습니다.");
         }
 
+        Project project = projectRepository.findById(requestDTO.getProjectId())
+                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+
         Schedule schedule = Schedule.builder()
-                .project(projectRepository.findById(requestDTO.getProjectId()).orElseThrow())
+                .project(project)
                 .date(requestDTO.getDate())
                 .build();
+
         scheduleRepository.save(schedule);
     }
 
@@ -81,7 +86,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                         .count();
 
                 // 일단 3개 예약 받음
-                int availableCount = 3 - (int) bookedCount;
+                int availableCount = 15 - (int) bookedCount;
 
                 dailySlots.add(new TimeSlotResponseDTO(
                         timeSlot,
