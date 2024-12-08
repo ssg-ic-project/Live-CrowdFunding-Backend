@@ -32,4 +32,5 @@ public class ProjectDetailForMakerResponseDTO { // 판매자 프로젝트 조회
     private Short isStreaming;
     private Long scheduleId;
     private LocalDateTime scheduleDate;
+    private String rejectionReason;
 }
